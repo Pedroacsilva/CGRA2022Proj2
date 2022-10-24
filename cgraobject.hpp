@@ -41,6 +41,7 @@ void PrintMat4(glm::mat4 Matrix);
 class CGRAobject {
 public:
   glm::mat4 modeltr;
+  glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
   DEECShader *shader;
   VertexArray m_VA;
   VertexBuffer m_VB;
@@ -53,11 +54,11 @@ public:
   virtual ~CGRAobject() = 0;
   void setModelTransformation(glm::mat4 &modeltransf);
   void setShader(DEECShader *shaderprog);
+  void SetColor(glm::vec4 color);
+  void SetUniform4f(glm::vec4 data, std::string uniformName);
   void Bind() const;
   void Unbind() const;
-
   void AddVA(const VertexArray va);
-
   void AddIndexBuffer(const void *data, unsigned int count);
   virtual void drawIt(glm::mat4 V, glm::mat4 P);
 };
@@ -71,6 +72,7 @@ public:
   void setModelTransformation(glm::mat4 &modeltransf) = delete;
   void SetTransformFromMother(glm::mat4 &modeltransf);
   void PropagateModelTransformation(glm::mat4 &modeltransf);
+
 
   CGRAobject * Object;
   glm::mat4 TransformFromMother;
