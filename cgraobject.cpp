@@ -385,11 +385,15 @@ xy = r *  cos(phi)            */
     p1 = i * 11;
     p2 = p1 + 11;
     for (int j = 0; j < 10; j++, p1++, p2++) {
+      // Fragmentos do pólo norte podem ser descritos por um triângulo dado que os vértices com phi = 180
+      // colapsam no mesmo ponto.
       if (i != 0) {
         indices.emplace_back(p1);
         indices.emplace_back(p2);
         indices.emplace_back(p1 + 1);
       }
+      // Fragmentos do pólo sul podem ser descritos por um triângulo dado que os vértices com phi = 180
+      // colapsam no mesmo ponto.
       if (i != 9) {
         indices.emplace_back(p1 + 1);
         indices.emplace_back(p2);
