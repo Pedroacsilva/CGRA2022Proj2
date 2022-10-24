@@ -60,7 +60,7 @@
 
 #define GLEW_STATIC
 
-Camera camera(glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f,
+Camera camera(glm::vec3(0.0f, 3.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f,
               0.0f);
 
 /*Camera cameraCarro(glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f),
@@ -94,6 +94,17 @@ float cameraSpeed = 1.0f;
            : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
 }*/
+
+glm::vec4 GetTranslationFromMat4(const glm::mat4 &modeltr) {
+  glm::vec4 outVector;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if (i == 3)
+        outVector[j] = modeltr[i][j];
+    }
+  }
+  return outVector;
+}
 
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
                  int mods) {
@@ -176,6 +187,8 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
 
 int main(int argc, char const *argv[]) {
 
+  // Inicialização de Glfw e Glew
+
   if (!glfwInit()) {
     std::cout << "Error initializing GLFW.\n";
     return -1;
@@ -204,6 +217,8 @@ int main(int argc, char const *argv[]) {
     return -1;
   }
 
+  // Carregar & linkar shaders
+
   basicShader = new DEECShader;
   std::cout << "loading shaders.\n";
   if (basicShader->loadShaders("basic.vert", "basic.frag") == GL_FALSE) {
@@ -222,14 +237,19 @@ int main(int argc, char const *argv[]) {
   std::cout << "Version: " << glGetString(GL_VERSION) << "\n";
   std::cout << "GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
 
-  glEnable(GL_BLEND | GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
+  // Ligar teste de profundidade. O fragmento com menor profundidade será
+  // desenhado.
+
   glEnable(GL_DEPTH_TEST);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDepthFunc(GL_LESS);
+
+  // Cor do céu. Aproveitar para o cenário
   glClearColor(0.53f, 0.8f, 0.92f, 1.0f);
 
-  glm::mat4 proj = glm::perspective(glm::radians(80.0f), 1.0f, 0.5f, 50.0f);
+  // Matriz de projecção: perspectiva com near plane = 0.5f e far plane = 30.0f. FOV = 80º
+  glm::mat4 proj = glm::perspective(glm::radians(80.0f), 1.0f, 0.5f, 30.0f);
 
+  // Declarar objectos
   CGRASquare chao;
   CGRACube carroCorpo, carro2Corpo;
   CGRASquare cartaz;
@@ -243,15 +263,12 @@ int main(int argc, char const *argv[]) {
   CGRACompound carro2CorpoObj(carro2Corpo);
   CGRACompound carro2PneuObj(carroPneu3);
   CGRACompound carro2Pneu2Obj(carroPneu4);
-
   CGRACompound arvoreTroncoObj(arvoreTronco);
   CGRACompound arvoreFolhasObj(arvoreFolhas);
-  //  CGRACompound carroPneu3Obj(carroPneu3);
 
   std::vector<glm::vec3> revoPontos;
-  revoPontos.emplace_back(glm::vec3(1.0f, 0.0f, 0.0f));
-  revoPontos.emplace_back(glm::vec3(0.7f, 0.0f, 0.0f));
-  
+  revoPontos.emplace_back(glm::vec3(1.2f, 0.0f, 0.0f));
+  revoPontos.emplace_back(glm::vec3(0.5f, 0.0f, 0.0f));
 
   std::vector<glm::vec3> extrPontos;
   extrPontos.emplace_back(glm::vec3(-1.0f, 2.0f, 0.0f));
@@ -298,16 +315,16 @@ int main(int argc, char const *argv[]) {
   glm::mat4 arvoreFolhasPosition(1.0f);
   glm::mat4 arvoreTroncoPosition(1.0f);
 
-  // model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f,
-  // 0.0f));
+  // Deslocar objectos na cena.
 
   cartazPosition = glm::scale(cartazPosition, glm::vec3(5.0f, 2.5f, 3.0f));
   cartazPosition = glm::translate(cartazPosition, glm::vec3(1.5f, 0.0f, -2.0f));
   cartazPosition = glm::rotate(cartazPosition, glm::degrees(120.0f),
                                glm::vec3(0.0f, 1.0f, 0.0f));
-  chaoPosition = glm::scale(chaoPosition, glm::vec3(20.0f, 20.0f, 20.0f));
+
   chaoPosition = glm::rotate(chaoPosition, glm::degrees(90.0f),
                              glm::vec3(1.0f, 0.0f, 0.0f));
+  chaoPosition = glm::scale(chaoPosition, glm::vec3(15.0f, 15.0f, 15.0f));
   chaoPosition = glm::translate(chaoPosition, glm::vec3(0.0f, 0.0f, -0.001f));
 
   solPosition = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 8.0f, -5.0f));
@@ -315,6 +332,11 @@ int main(int argc, char const *argv[]) {
   std::vector<glm::vec3> pneuLocations = {glm::vec3(0.0f, 0.0f, 0.0f),
                                           glm::vec3(1.0f, 0.0f, 0.0f),
                                           glm::vec3(1.0f, 1.0f, 0.0f)};
+
+  std::vector<glm::vec3> coneLocations = {
+      glm::vec3(5.9f, -0.4f, -3.0f), glm::vec3(5.9f, 0.0f, -1.5f),
+      glm::vec3(5.9f, 0.0f, 0.0f), glm::vec3(5.9f, 0.5f, 1.5f),
+      glm::vec3(5.9f, 0.75f, 3.0f)};
 
   pneuPosition = glm::scale(pneuPosition, glm::vec3(0.6f, 0.1f, 0.2f));
   pneuPosition = glm::translate(pneuPosition, glm::vec3(-1.0f, 1.5f, 0.0f));
@@ -327,8 +349,6 @@ int main(int argc, char const *argv[]) {
   cone2Position = glm::rotate(cone2Position, glm::degrees(90.0f),
                               glm::vec3(1.0f, 0.0f, 0.0f));
 
-  /*glm::mat4 trackPosition =
-      glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.0f, 0.0f));*/
   trackPosition =
       glm::translate(trackPosition, glm::vec3(0.0f, 0.00001f, 0.0f));
   trackPosition = glm::rotate(trackPosition, glm::degrees(90.0f),
@@ -336,15 +356,11 @@ int main(int argc, char const *argv[]) {
   trackPosition = glm::scale(trackPosition, glm::vec3(5.0f, 5.0f, 5.0f));
 
   trophyPosition = glm::translate(trophyPosition, glm::vec3(0.0f, 1.0f, -1.5f));
-  /*glm::mat4 trophyPosition =
-      glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 0.0f));*/
 
   carroCorpoPosition =
       glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
   carro2CorpoPosition =
       glm::translate(carro2CorpoPosition, glm::vec3(7.0f, 1.0f, -2.0f));
-  //  carro2CorpoPosition = glm::translate(carro2CorpoPosition,
-  //  glm::vec3(6.0f, 1.0f, 0.0f));
 
   // Pneus do carro
 
@@ -357,17 +373,10 @@ int main(int argc, char const *argv[]) {
   glm::mat4 pneu22corpo = pneu2corpo;
   pneu22corpo = glm::translate(pneu22corpo, glm::vec3(3.0f, 0.0f, 0.0f));
 
-  //  glm::mat4 pneu32corpo = pneu22corpo;
-  //  pneu32corpo = glm::translate(pneu32corpo, glm::vec3(0.0f, 5.0f, 0.0f));
+  // Conectar pneus do carro aos corpos respectivos.
 
   carroCorpoObj.PushChild(&carroPneuObj, pneu2corpo);
   carroCorpoObj.PushChild(&carroPneu2Obj, pneu22corpo);
-
-  /*  glm::mat4 pneu2corpo2(1.0f);
-    pneu2corpo2 = glm::scale(pneu2corpo2, glm::vec3(0.1f, 0.5f, 0.1f));
-    pneu2corpo2 = glm::translate(pneu2corpo2, glm::vec3(1.0f, -1.5f, 2.5f));
-    pneu2corpo2 = glm::rotate(pneu2corpo2, glm::degrees(90.0f),
-                              glm::vec3(1.0f, 0.0f, 0.0f));*/
 
   carro2CorpoObj.PushChild(&carro2PneuObj, pneu2corpo);
   carro2CorpoObj.PushChild(&carro2Pneu2Obj, pneu22corpo);
@@ -377,15 +386,15 @@ int main(int argc, char const *argv[]) {
   arvoreFolhasPosition =
       glm::scale(arvoreFolhasPosition, glm::vec3(4.5f, 1.5f, 1.0f));
 
+  // Conectar folhas da árvore ao tronco.
   arvoreTroncoObj.PushChild(&arvoreFolhasObj, arvoreFolhasPosition);
-  std::vector<glm::vec3> arvoresLocations = {
-      glm::vec3(0.0f, 0.0f, 0.0f),/* glm::vec3(-12.0f, 0.0f, 0.0f),
-      glm::vec3(3.0f, 0.0f, -5.0f), glm::vec3(1.0f, 0.0f, 4.0f)*/};
+
   arvoreTroncoPosition =
       glm::translate(arvoreTroncoPosition, glm::vec3(-7.0f, 0.3f, 0.0f));
   arvoreTroncoPosition =
       glm::scale(arvoreTroncoPosition, glm::vec3(0.3f, 1.0f, 1.0f));
 
+  // Definir transformadas iniciais.
   chao.setModelTransformation(chaoPosition);
   cartaz.setModelTransformation(cartazPosition);
   sol.setModelTransformation(solPosition);
@@ -397,9 +406,8 @@ int main(int argc, char const *argv[]) {
   carroCorpoObj.PropagateModelTransformation(carroCorpoPosition);
   carro2CorpoObj.PropagateModelTransformation(carro2CorpoPosition);
   arvoreTroncoObj.PropagateModelTransformation(arvoreTroncoPosition);
-  //  carroCorpo.setModelTransformation(carroCorpoPosition);
-  //  carroPneuObj.setModelTransformation(pneu2corpo);
 
+  // Definição de cores.
   glm::vec4 grassColor = glm::vec4(0.3f, 0.5f, 0.27f, 1.0f);
   glm::vec4 treeColor = glm::vec4(0.2f, 0.8f, 0.27f, 1.0f);
   glm::vec4 trunkColor = glm::vec4(0.39f, 0.26f, 0.13f, 1.0f);
@@ -429,10 +437,8 @@ int main(int argc, char const *argv[]) {
   arvoreFolhas.SetColor(treeColor);
   arvoreTronco.SetColor(trunkColor);
 
+  // Preparar câmara para rastrear posição de um condutor.
   glm::vec3 cameraCarroPosition(1.0f);
-
-  /*  int color_location =
-        glGetUniformLocation(basicShader->shaderprogram, "u_Colors");*/
 
   float carroTheta = 0.0f;
 
@@ -449,48 +455,35 @@ int main(int argc, char const *argv[]) {
     lastFrame = currentFrame;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 aux(1.0f);
-    aux = glm::rotate(aux, glm::degrees(0.0001f), glm::vec3(0.0f, 1.0f, -0.2f));
+    glm::mat4 carrosPos(1.0f);
+    // Incrementar rotação dos carros
+    carrosPos = glm::rotate(carrosPos, glm::degrees(0.0001f),
+                            glm::vec3(0.0f, 1.0f, -0.2f));
 
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < 4; j++) {
-        if (i == 3)
-          //          std::cout << j << "-ésima coordenada:\t";
-          std::cout << carroCorpoObj.Object->modeltr[i][j] << "\t";
-        driverPosition[j] = carroCorpoObj.Object->modeltr[i][j];
-      }
-    }
-    std::cout << "\n";
+    // Obter posição do piloto (e incrementar y um bocado)
+    driverPosition = GetTranslationFromMat4(carroCorpoObj.Object->modeltr);
     driverPositionVec3[0] = driverPosition[0];
     driverPositionVec3[1] =
         driverPosition[1] + 1.0f; // Acrescentar alguma altura ao condutor para
                                   // nao estar dentro do carro
     driverPositionVec3[2] = driverPosition[2];
 
+    // Frente do condutor = up vector x posição condutor
     driverFront = glm::normalize(
         glm::cross(glm::vec3(0.0, 1.0f, 0.0f), driverPositionVec3));
-
-    /*    driverFront = glm::normalize(
-            glm::cross(driverPositionVec3, glm::vec3(0.0, 1.0f, 0.0f)));*/
 
     driverView =
         glm::lookAt(driverPositionVec3, driverPositionVec3 + driverFront,
                     // driverPositionVec3 + glm::vec3(0.0f, 0.0f, -1.0f),
                     glm::vec3(0.0f, 1.0f, 0.0f));
 
-    std::cout << "CarroCorpoObj Matrix:\n";
-    PrintMat4(carroCorpoObj.Object->modeltr);
-    std::cout << "\n";
-
     if (visitorPOV)
       // Obter matriz de vista do visitor.
       activeView = camera.GetViewMatrix();
     else
+      // Definir matriz de vista como a do condutor.
       activeView = driverView;
 
-    // Definir cor do chao a verde
-    /*    glUniform4f(color_location, grassColor[0],
-       grassColor[1], grassColor[2], grassColor[3]);*/
     // Desenhar chao
     chao.drawIt(activeView, proj);
 
@@ -498,18 +491,12 @@ int main(int argc, char const *argv[]) {
     cartaz.drawIt(activeView, proj);
 
     // Desenhar pista
-    /*    glUniform4f(color_location, trackColor[0], trackColor[1],
-       trackColor[2], trackColor[3]);*/
     track.drawIt(activeView, proj);
 
     // Desenhar trofeu
-    /*    glUniform4f(color_location, trophyColor[0], trophyColor[1],
-       trophyColor[2], trophyColor[3]);*/
     trophy.drawIt(activeView, proj);
 
     // Desenhar pneus
-    /*    glUniform4f(color_location, pneuColor[0], pneuColor[1], pneuColor[2],
-                    pneuColor[3]);*/
     for (const auto &elemt : pneuLocations) {
       glm::mat4 location = pneuPosition;
       location = glm::translate(location, elemt);
@@ -517,15 +504,17 @@ int main(int argc, char const *argv[]) {
       pneu.drawIt(activeView, proj);
     }
 
+    // Desenhar cones
+    for (const auto &elemt : coneLocations) {
+      glm::mat4 location(1.0f);
+      location = glm::translate(location, elemt);
+      cone.setModelTransformation(location);
+      cone.drawIt(activeView, proj);
+    }
+
     // Desenhar sol
-    /*    glUniform4f(color_location, solColor[0], solColor[1], solColor[2],
-                    solColor[3]);*/
     sol.drawIt(activeView, proj);
 
-    // Desenhar cone
-    /*    glUniform4f(color_location, coneColor[0], coneColor[1], coneColor[2],
-                    coneColor[3]);*/
-    cone.drawIt(activeView, proj);
     // Desenhar cone (revolucao)
     cone2.drawIt(activeView, proj);
 
@@ -533,30 +522,12 @@ int main(int argc, char const *argv[]) {
     arvoreTroncoObj.DrawTree(activeView, proj);
 
     // Desenhar carro
-    carroCorpoObj.PropagateModelTransformation(aux);
-    carro2CorpoObj.PropagateModelTransformation(aux);
-    // carroCorpoObj.DrawTree(activeView, proj);
+    carroCorpoObj.PropagateModelTransformation(carrosPos);
+    carro2CorpoObj.PropagateModelTransformation(carrosPos);
+
     carroCorpoObj.DrawTree(activeView, proj);
     carro2CorpoObj.DrawTree(activeView, proj);
 
-    /*    glUniform4f(color_location, carroColor[0], carroColor[1],
-       carroColor[2], carroColor[3]);*/
-    //    carroCorpoObj.SetTreeTransformation(carroCorpoPosition);
-
-    //    carroCorpoPosition = glm::rotate(carroCorpoPosition,
-    //    glm::degrees(carroTheta), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    //    carroCorpoPosition = glm::scale(carroCorpoPosition, glm::vec3(0.8f,
-    //    0.6f, 0.8f));
-
-    //    carroCorpoObj.DrawTree(activeView, proj);
-
-    //    carroPneu.drawIt(activeView, proj);
-
-    //    pneu.drawIt(activeView, proj);
-    /*cubo.drawIt(activeView, proj);
-    esfera.drawIt(activeView, proj);*/
-    // cone.drawIt(activeView, proj);
     glfwSwapBuffers(window);
     glfwPollEvents();
     carroTheta += deltaTime * 0.02f;
