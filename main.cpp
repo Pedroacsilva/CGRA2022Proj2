@@ -199,7 +199,7 @@ int main(int argc, char const *argv[]) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   /* Create a windowed mode window and its OpenGL context */
-  window = glfwCreateWindow(640, 480, "Chessboard", NULL, NULL);
+  window = glfwCreateWindow(640, 480, "Projecto 1 - Pedro Silva", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -322,9 +322,9 @@ int main(int argc, char const *argv[]) {
   cartazPosition = glm::rotate(cartazPosition, glm::degrees(120.0f),
                                glm::vec3(0.0f, 1.0f, 0.0f));
 
+  chaoPosition = glm::scale(chaoPosition, glm::vec3(15.0f, 15.0f, 15.0f));
   chaoPosition = glm::rotate(chaoPosition, glm::degrees(90.0f),
                              glm::vec3(1.0f, 0.0f, 0.0f));
-  chaoPosition = glm::scale(chaoPosition, glm::vec3(15.0f, 15.0f, 15.0f));
   chaoPosition = glm::translate(chaoPosition, glm::vec3(0.0f, 0.0f, -0.001f));
 
   solPosition = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 8.0f, -5.0f));
@@ -360,7 +360,7 @@ int main(int argc, char const *argv[]) {
   carroCorpoPosition =
       glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
   carro2CorpoPosition =
-      glm::translate(carro2CorpoPosition, glm::vec3(7.0f, 1.0f, -2.0f));
+      glm::translate(carro2CorpoPosition, glm::vec3(7.0f, 1.0f, 0.0f));
 
   // Pneus do carro
 
@@ -420,6 +420,8 @@ int main(int argc, char const *argv[]) {
   glm::vec4 carroColor = glm::vec4(0.9f, 0.3f, 0.2f, 1.0f);
   glm::vec4 carro2Color = glm::vec4(0.5f, 0.1f, 0.9f, 1.0f);
 
+
+  // Transmitir cores como variáveis uniformes
   trophy.SetColor(trophyColor);
   track.SetColor(trackColor);
   pneu.SetColor(pneuColor);

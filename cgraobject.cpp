@@ -23,18 +23,16 @@
 #define IB
 #endif
 
-
 // Classe para print mat4
 
-void PrintMat4(glm::mat4 Matrix){
-  for(int i = 0; i < 4; i++){
-    for(int j = 0; j < 4; j++){
+void PrintMat4(glm::mat4 Matrix) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
       std::cout << Matrix[j][i] << "\t";
     }
     std::cout << "\n";
   }
 }
-
 
 // Classe base
 CGRAobject::CGRAobject() { modeltr = glm::mat4(1.0); }
@@ -45,18 +43,14 @@ void CGRAobject::setModelTransformation(glm::mat4 &modeltransf) {
   modeltr = modeltransf;
 }
 
-void CGRAobject::setShader(DEECShader *shaderprog) {
-  shader = shaderprog;
-}
+void CGRAobject::setShader(DEECShader *shaderprog) { shader = shaderprog; }
 
-void CGRAobject::SetUniform4f(glm::vec4 data, std::string uniformName){
-  int data_location = glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
+void CGRAobject::SetUniform4f(glm::vec4 data, std::string uniformName) {
+  int data_location =
+      glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
   glUniform4f(data_location, data[0], data[1], data[2], data[3]);
-  
 }
-void CGRAobject::SetColor(glm::vec4 in_color){
-  color = in_color;
-}
+void CGRAobject::SetColor(glm::vec4 in_color) { color = in_color; }
 
 void CGRAobject::drawIt(glm::mat4 V, glm::mat4 P) {}
 
@@ -96,7 +90,7 @@ void CGRACompound::SetTransformFromMother(glm::mat4 &modeltransf) {
 
 void CGRACompound::PropagateModelTransformation(glm::mat4 &modeltransf) {
   Object->modeltr = modeltransf * Object->modeltr;
-  for(const auto & elemt: Children){
+  for (const auto &elemt : Children) {
     elemt->TransformFromMother = modeltransf * elemt->TransformFromMother;
   }
 }
@@ -107,6 +101,8 @@ void CGRACompound::PropagateModelTransformation(glm::mat4 &modeltransf) {
 
 CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
   std::vector<float> vtx_info;
+  unsigned int numPontos = pontos.size();
+  std::cout << "num de pontos: " << numPontos << "\n";
   float x_new = 0.0f, y_new = 0.0f, z_new = 0.0f, x, y, z;
   // Push dos pontos iniciais
   for (const auto &elemt : pontos) {
@@ -114,7 +110,6 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     vtx_info.emplace_back(elemt[1]);
     vtx_info.emplace_back(elemt[2]);
   }
-  // Aplicar uma translação z = 1.0f aos pontos
   for (const auto &elemt : pontos) {
     x = elemt[0];
     y = elemt[1];
@@ -128,18 +123,30 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     vtx_info.emplace_back(z_new);
   }
 
-  // Indices forçados à mão. Terei de trabalhar nisto quando tiver tempo mas, novamente, prefiro ter este caso
-  // simplificado e alguma coisa desenhada no ecrã do que arriscar não mostrar nada
-  unsigned int indices[] = {
-      0, 3, 2, 0, 1, 2, 4, 7, 6, 4, 5, 6, 0, 3, 7, 0, 4, 7,
-      1, 2, 6, 1, 5, 6, 3, 7, 2, 2, 6, 7, 0, 4, 1, 1, 5, 4,
-  };
+  std::vector<unsigned int> indices;
+
+  for (unsigned int i = 0; i < numPontos; i++) {
+    indices.emplace_back(i);             // Entre [0, numPontos]
+    indices.emplace_back(i + numPontos); // Entre [numPontos, 2 * numPontos - 1]
+    indices.emplace_back((i + 1) % numPontos +
+                         numPontos); // Entre [numPontos, 2 * numPontos - 1]
+
+    std::cout << "i = " << i << ": " << i << ", " << i + numPontos << ", "
+              << i + 1 + numPontos << "\t";
+
+    indices.emplace_back(i);                   // Entre [0, numPontos]
+    indices.emplace_back((i + 1) % numPontos); // Entre [0, numPontos]
+    indices.emplace_back(((i + 1) % numPontos) +
+                         numPontos); // Entre [numPontos, 2* numPontos - 1]
+    std::cout << "i = " << i << ": " << i << ", " << ((i + 1) % numPontos)
+              << ", " << ((i + 1) % numPontos) + numPontos << "\n";
+  }
 
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
             GL_STATIC_DRAW);
 
   m_Layout.Push<float>(3, "Vertex Coordinates");
-  m_IB.Push(indices, sizeof(indices));
+  m_IB.Push(indices.data(), indices.size());
   m_VA.AddBuffer(m_VB, m_Layout);
 }
 
@@ -191,22 +198,29 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
   std::vector<int> indices;
   int p1, p2;
   int pStep = pontos.size();
-  // Esta implementação funciona apenas para 2 pontos!! Terei de fazer outro nested loop para iterar (ver caso esfera)
-  // p1 entre 1 até Nº de pontos -1. Se tiver tempo quando o projecto estiver estável, trabalho nisso. Por enquanto,
-  // apenas quero   qualquer coisa a ser desenhada no ecra
-  for(int i = 0; i < 9; i++){
-    p1 = i * pStep;
-    p2 = p1 + 1;
-    indices.emplace_back(p1);
-    indices.emplace_back(p2);
-    indices.emplace_back(p2 + pStep);
+  // Esta implementação funciona apenas para 2 pontos!! Terei de fazer outro
+  // nested loop para iterar (ver caso esfera) p1 entre 1 até Nº de pontos -1.
+  // Se tiver tempo quando o projecto estiver estável, trabalho nisso. Por
+  // enquanto, apenas quero   qualquer coisa a ser desenhada no ecra
 
-    indices.emplace_back(p1);
-    indices.emplace_back(p2 + pStep);
-    indices.emplace_back(p1 + pStep);
+  // Iterar ao longo das rotações
+  for (unsigned int i = 0; i < 9; i++) {
+    // Iterar ao longo dos pontos
+    for (unsigned int j = 0; j < pontos.size(); j++) {
+      p1 = i * pStep;
+      p2 = p1 + 1;
+      indices.emplace_back(p1);
+      indices.emplace_back(p2);
+      indices.emplace_back(p2 + pStep);
+
+      indices.emplace_back(p1);
+      indices.emplace_back(p2 + pStep);
+      indices.emplace_back(p1 + pStep);
+    }
   }
 
-  // Caso degenerado, vértices vão OOB. Agora que me lembro, podia ter feito indice % limite.
+  // Caso degenerado, vértices vão OOB. Agora que me lembro, podia ter feito
+  // indice % limite.
 
   indices.emplace_back(pStep * 9);
   indices.emplace_back(pStep * 9 + 1);
@@ -220,11 +234,9 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
   m_Layout.Push<float>(3, "Vertex Coordinates");
   m_IB.Push(indices.data(), indices.size());
   m_VA.AddBuffer(m_VB, m_Layout);
-
 }
 
 CGRARevolution::~CGRARevolution() {}
-
 
 void CGRARevolution::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
@@ -243,14 +255,14 @@ void CGRARevolution::drawIt(glm::mat4 V, glm::mat4 P) {
 
 CGRASquare::CGRASquare() {
   float face_positions[] = {
-      // Vertex Coordinates  
+      // Vertex Coordinates
       -0.5f, -0.5f, 0.0f, // 0
-      0.5f, -0.5f, 0.0f,  // 1
-      0.5f, 0.5f, 0.0f,   // 2
-      -0.5f, 0.5f, 0.0f   // 3
-    };
-  
-  unsigned int indices[] = {0,  1,  2,  2,  3,  0};
+      0.5f,  -0.5f, 0.0f, // 1
+      0.5f,  0.5f,  0.0f, // 2
+      -0.5f, 0.5f,  0.0f  // 3
+  };
+
+  unsigned int indices[] = {0, 1, 2, 2, 3, 0};
   m_VB.Push(GL_ARRAY_BUFFER, sizeof(face_positions), face_positions,
             GL_STATIC_DRAW);
   m_IB.Push(indices, 6);
@@ -259,10 +271,7 @@ CGRASquare::CGRASquare() {
   setShader(shader);
 }
 
-
-
 CGRASquare::~CGRASquare() {}
-
 
 void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
@@ -278,38 +287,38 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
 |         Cubo              |
 +---------------------------*/
 
-CGRACube::CGRACube(){
-    float face_positions[] = {
-      // Vertex Coordinates  
-      -0.5f, -0.5f, -0.5f,    // 0
-      0.5f, -0.5f, -0.5f,     // 1
-      0.5f, 0.5f, -0.5f,      // 2
-      -0.5f, 0.5f, -0.5f,     // 3
-      //------------------//-----------------------------------------------------------
-      -0.5f, -0.5f, 0.5f,     // 4
-      0.5f, -0.5f, 0.5f,      // 5
-      0.5f, 0.5f, 0.5f,       // 6
-      -0.5f, 0.5f, 0.5f,      // 7
-      //------------------//-----------------------------------------------------------
-      0.5f, -0.5f, 0.5f,      // 8
-      0.5f, -0.5f, -0.5f,     // 9
-      0.5f, 0.5f, -0.5f,      // 10
-      0.5f, 0.5f, 0.5f,       // 11
-      //------------------//-----------------------------------------------------------
-      -0.5f, -0.5f, 0.5f,     // 12
-      -0.5f, -0.5f, -0.5f,    // 13
-      -0.5f, 0.5f, -0.5f,     // 14
-      -0.5f, 0.5f, 0.5f,      // 15
-      //------------------//-----------------------------------------------------------
-      -0.5f, 0.5f, 0.5f,      // 16
-      0.5f, 0.5f, 0.5f,       // 17
-      0.5f, 0.5f, -0.5f,      // 18
-      -0.5f, 0.5f, -0.5f,     // 19
-      //------------------//-----------------------------------------------------------
-      -0.5f, -0.5f, 0.5f,     // 20
-      0.5f, -0.5f, 0.5f,      // 21
-      0.5f, -0.5f, -0.5f,     // 22
-      -0.5f, -0.5f, -0.5f,    // 23
+CGRACube::CGRACube() {
+  float face_positions[] = {
+      // Vertex Coordinates
+      -0.5f, -0.5f, -0.5f, // 0
+      0.5f, -0.5f, -0.5f,  // 1
+      0.5f, 0.5f, -0.5f,   // 2
+      -0.5f, 0.5f, -0.5f,  // 3
+      //---------------------//
+      -0.5f, -0.5f, 0.5f, // 4
+      0.5f, -0.5f, 0.5f,  // 5
+      0.5f, 0.5f, 0.5f,   // 6
+      -0.5f, 0.5f, 0.5f,  // 7
+      //---------------------//
+      0.5f, -0.5f, 0.5f,  // 8
+      0.5f, -0.5f, -0.5f, // 9
+      0.5f, 0.5f, -0.5f,  // 10
+      0.5f, 0.5f, 0.5f,   // 11
+      //---------------------//
+      -0.5f, -0.5f, 0.5f,  // 12
+      -0.5f, -0.5f, -0.5f, // 13
+      -0.5f, 0.5f, -0.5f,  // 14
+      -0.5f, 0.5f, 0.5f,   // 15
+      //---------------------//
+      -0.5f, 0.5f, 0.5f,  // 16
+      0.5f, 0.5f, 0.5f,   // 17
+      0.5f, 0.5f, -0.5f,  // 18
+      -0.5f, 0.5f, -0.5f, // 19
+      //---------------------//
+      -0.5f, -0.5f, 0.5f,  // 20
+      0.5f, -0.5f, 0.5f,   // 21
+      0.5f, -0.5f, -0.5f,  // 22
+      -0.5f, -0.5f, -0.5f, // 23
   };
 
   unsigned int indices[] = {0,  1,  2,  2,  3,  0,  4,  5,  6,  6,  7,  4,
@@ -321,13 +330,9 @@ CGRACube::CGRACube(){
   m_IB.Push(indices, 6 * 6);
   m_Layout.Push<float>(3, "Vertex Coordinates");
   m_VA.AddBuffer(m_VB, m_Layout);
-  
 }
 
-CGRACube::~CGRACube() 
-{
-  
-}
+CGRACube::~CGRACube() {}
 
 void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
@@ -339,7 +344,6 @@ void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
-
 /*--------------------------+
 |         Esfera            |
 +---------------------------*/
@@ -349,7 +353,7 @@ CGRASphere::CGRASphere() {
   /*    Eqs paramétricas
 x = (r * cos(phi) * cos(theta))
 y = (r * cos(phi) * sin(theta))
-z = r * sin(phi)    
+z = r * sin(phi)
 xy = r *  cos(phi)            */
   const float radius = 1.0f;
   const float PI = 3.14f;
@@ -363,7 +367,7 @@ xy = r *  cos(phi)            */
     stackAngle = PI / 2 - i * stackStep; // Começar no pólo norte
     xy = radius * std::cos(stackAngle);
     z = radius * std::sin(stackAngle);
-    for (int j = 0; j <= 10; j++) {     // Rodar linha longitudinal
+    for (int j = 0; j <= 10; j++) { // Rodar linha longitudinal
       sectorAngle = j * sectorStep;
       x = xy * std::cos(sectorAngle);
       y = xy * std::sin(sectorAngle);
@@ -377,7 +381,6 @@ xy = r *  cos(phi)            */
             GL_STATIC_DRAW);
   m_Layout.Push<float>(3, "Vertex Coordinates");
 
-
   // Preparar IBO
   std::vector<int> indices;
   int p1, p2;
@@ -385,15 +388,15 @@ xy = r *  cos(phi)            */
     p1 = i * 11;
     p2 = p1 + 11;
     for (int j = 0; j < 10; j++, p1++, p2++) {
-      // Fragmentos do pólo norte podem ser descritos por um triângulo dado que os vértices com phi = 180
-      // colapsam no mesmo ponto.
+      // Fragmentos do pólo norte podem ser descritos por um triângulo dado que
+      // os vértices com phi = 180 colapsam no mesmo ponto.
       if (i != 0) {
         indices.emplace_back(p1);
         indices.emplace_back(p2);
         indices.emplace_back(p1 + 1);
       }
-      // Fragmentos do pólo sul podem ser descritos por um triângulo dado que os vértices com phi = 180
-      // colapsam no mesmo ponto.
+      // Fragmentos do pólo sul podem ser descritos por um triângulo dado que os
+      // vértices com phi = 180 colapsam no mesmo ponto.
       if (i != 9) {
         indices.emplace_back(p1 + 1);
         indices.emplace_back(p2);
@@ -406,7 +409,6 @@ xy = r *  cos(phi)            */
 }
 
 CGRASphere::~CGRASphere() {}
-
 
 void CGRASphere::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
@@ -422,7 +424,6 @@ void CGRASphere::drawIt(glm::mat4 V, glm::mat4 P) {
 /*--------------------------+
 |         Cilindro          |
 +---------------------------*/
-
 
 CGRACylinder::CGRACylinder() {
   const float raio = 0.5f;
@@ -470,13 +471,11 @@ CGRACylinder::CGRACylinder() {
   m_VA.AddBuffer(m_VB, m_Layout);
 }
 
-
 CGRACylinder::~CGRACylinder() {}
 
 void CGRACylinder::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
-
 
   glm::mat4 mvp = P * V * modeltr;
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
@@ -542,7 +541,6 @@ CGRACone::CGRACone() {
 
 CGRACone::~CGRACone() {}
 
-
 void CGRACone::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
@@ -553,5 +551,3 @@ void CGRACone::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniform4f(color, "u_Colors");
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
-
-
