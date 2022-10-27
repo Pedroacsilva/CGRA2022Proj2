@@ -102,7 +102,7 @@ void CGRACompound::PropagateModelTransformation(glm::mat4 &modeltransf) {
 CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
   std::vector<float> vtx_info;
   unsigned int numPontos = pontos.size();
-  std::cout << "num de pontos: " << numPontos << "\n";
+//  std::cout << "num de pontos: " << numPontos << "\n";
   float x_new = 0.0f, y_new = 0.0f, z_new = 0.0f, x, y, z;
   // Push dos pontos iniciais
   for (const auto &elemt : pontos) {
@@ -131,15 +131,15 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     indices.emplace_back((i + 1) % numPontos +
                          numPontos); // Entre [numPontos, 2 * numPontos - 1]
 
-    std::cout << "i = " << i << ": " << i << ", " << i + numPontos << ", "
-              << i + 1 + numPontos << "\t";
+/*    std::cout << "i = " << i << ": " << i << ", " << i + numPontos << ", "
+              << i + 1 + numPontos << "\t";*/
 
     indices.emplace_back(i);                   // Entre [0, numPontos]
     indices.emplace_back((i + 1) % numPontos); // Entre [0, numPontos]
     indices.emplace_back(((i + 1) % numPontos) +
                          numPontos); // Entre [numPontos, 2* numPontos - 1]
-    std::cout << "i = " << i << ": " << i << ", " << ((i + 1) % numPontos)
-              << ", " << ((i + 1) % numPontos) + numPontos << "\n";
+/*    std::cout << "i = " << i << ": " << i << ", " << ((i + 1) % numPontos)
+              << ", " << ((i + 1) % numPontos) + numPontos << "\n";*/
   }
 
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),

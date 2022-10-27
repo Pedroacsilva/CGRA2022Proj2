@@ -360,7 +360,7 @@ int main(int argc, char const *argv[]) {
   carroCorpoPosition =
       glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
   carro2CorpoPosition =
-      glm::translate(carro2CorpoPosition, glm::vec3(7.0f, 1.0f, 0.0f));
+      glm::translate(carro2CorpoPosition, glm::vec3(7.0f, 1.0f, -2.0f));
 
   // Pneus do carro
 
