@@ -360,35 +360,35 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
 CGRACube::CGRACube() {
   float face_positions[] = {
       // Vertex Coordinates  Tex Coords       RGBA  Values       Normals
-      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f,// 0
-      0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, -1.0f,// 1
-      0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 0.0f, -1.0f,// 2
-      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, -1.0f,// 3
+      -0.5f, -0.5f, -0.5f,    0.00f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f,// 0
+      0.5f, -0.5f, -0.5f,     0.25f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, -1.0f,// 1
+      0.5f, 0.5f, -0.5f,      0.25f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 0.0f, -1.0f,// 2
+      -0.5f, 0.5f, -0.5f,     0.00f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, -1.0f,// 3
       //-----------------------------------------------------------------------------
-      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, // 4
-      0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, 1.0f, // 5
-      0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 0.0f, 1.0f, // 6
-      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, 1.0f, // 7
+      -0.5f, -0.5f, 0.5f,     0.75f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, // 4
+      0.5f, -0.5f, 0.5f,      0.50f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, 1.0f, // 5
+      0.5f, 0.5f, 0.5f,       0.50f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 0.0f, 1.0f, // 6
+      -0.5f, 0.5f, 0.5f,      0.75f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, 1.0f, // 7
       //-----------------------------------------------------------------------------
-      0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  1.0f, 0.0f, 0.0f,// 8
-      0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f,// 9
-      0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  1.0f, 0.0f, 0.0f,// 10
-      0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,   1.0f, 0.0f, 0.0f,// 11
+      0.5f, -0.5f, 0.5f,      0.50f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f,  1.0f, 0.0f, 0.0f,// 8
+      0.5f, -0.5f, -0.5f,     0.25f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f,// 9
+      0.5f, 0.5f, -0.5f,      0.25f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,  1.0f, 0.0f, 0.0f,// 10
+      0.5f, 0.5f, 0.5f,       0.50f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,   1.0f, 0.0f, 0.0f,// 11
       //-----------------------------------------------------------------------------
-      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f, // 12
-      -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,-1.0f, 0.0f, 0.0f, // 13
-      -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f, // 14
-      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  -1.0f, 0.0f, 0.0f, // 15
+      -0.5f, -0.5f, 0.5f,     0.75f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f, // 12
+      -0.5f, -0.5f, -0.5f,    1.00f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f,-1.0f, 0.0f, 0.0f, // 13
+      -0.5f, 0.5f, -0.5f,     1.00f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f, // 14
+      -0.5f, 0.5f, 0.5f,      0.75f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,  -1.0f, 0.0f, 0.0f, // 15
       //-----------------------------------------------------------------------------
-      -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 1.0f, 0.0f,// 16
-      0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 1.0f, 0.0f,// 17
-      0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 1.0f, 0.0f,// 18
-      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f,// 19
+      -0.5f, 0.5f, 0.5f,      0.75f, 1.00f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 1.0f, 0.0f,// 16
+      0.5f, 0.5f, 0.5f,       0.50f, 1.00f,     0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 1.0f, 0.0f,// 17
+      0.5f, 0.5f, -0.5f,      0.50f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 1.0f, 0.0f,// 18
+      -0.5f, 0.5f, -0.5f,     0.75f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f,// 19
       //-----------------------------------------------------------------------------
-      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f,// 20
-      0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, -1.0f, 0.0f,// 21
-      0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f,// 22
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f// 23
+      -0.5f, -0.5f, 0.5f,     0.75f, 0.00f,     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f,// 20
+      0.5f, -0.5f, 0.5f,      0.50f, 0.00f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, -1.0f, 0.0f,// 21
+      0.5f, -0.5f, -0.5f,     0.50f, 0.33f,       0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f,// 22
+      -0.5f, -0.5f, -0.5f,    0.75f, 0.33f,       0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f// 23
   };
 
   unsigned int indices[] = {0,  1,  2,  2,  3,  0,  4,  5,  6,  6,  7,  4,
@@ -433,29 +433,38 @@ xy = r *  cos(phi)            */
   const float radius = 1.0f;
   const float PI = 3.14f;
   float x, y, z, xy;
+  //float nx, ny, nz;
+  float u, v;
   float sectorStep = 2 * PI / 10;
   float stackStep = PI / 10;
   float sectorAngle, stackAngle;
-  std::vector<float> vtx_info;
+  std::vector <float> vtx_info;
 
-  for (int i = 0; i <= 10; i++) {
-    stackAngle = PI / 2 - i * stackStep; // Começar no pólo norte
+  for(int i = 0; i <= 10; i++){
+    stackAngle = PI / 2 - i * stackStep;    //Começar no pólo norte
     xy = radius * std::cos(stackAngle);
     z = radius * std::sin(stackAngle);
-    for (int j = 0; j <= 10; j++) { // Rodar linha longitudinal
+    for(int j = 0; j <= 10; j++){
       sectorAngle = j * sectorStep;
       x = xy * std::cos(sectorAngle);
       y = xy * std::sin(sectorAngle);
-      // XYZ
-      vtx_info.emplace_back(x);
-      vtx_info.emplace_back(y);
-      vtx_info.emplace_back(z);
+      //XYZ
+      vtx_info.emplace_back(x);       vtx_info.emplace_back(y);       vtx_info.emplace_back(z);
+      //V
+      u = static_cast<float>(j) / 10;
+      v = static_cast<float>(i) / 10;
+      vtx_info.emplace_back(u);       vtx_info.emplace_back(v);
+      //RGBA
+      vtx_info.emplace_back(0.5f);    vtx_info.emplace_back(0.5f);    vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
+      //Normals
+      vtx_info.emplace_back(x);       vtx_info.emplace_back(y);       vtx_info.emplace_back(z);
     }
   }
-  m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
-            GL_STATIC_DRAW);
-  m_Layout.Push<float>(3, "Vertex Coordinates");
-
+      m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(), GL_STATIC_DRAW);
+      m_Layout.Push<float>(3, "Vertex Coordinates");
+      m_Layout.Push<float>(2, "Texture Coordinates");
+      m_Layout.Push<float>(4, "Vertex Colors");
+      m_Layout.Push<float>(3, "Vertex Normals");
   // Preparar IBO
   std::vector<int> indices;
   int p1, p2;
@@ -493,6 +502,8 @@ void CGRASphere::drawIt(glm::mat4 V, glm::mat4 P) {
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
   SetUniform4f(color, "u_Colors");
+  if(hasTexture)
+    glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
@@ -504,25 +515,38 @@ CGRACylinder::CGRACylinder() {
   const float raio = 0.5f;
   const float PI = 3.14f;
   float theta = 0.0f;
-  std::vector<float> vtx_info;
-  // Círculo inferior
-  for (int i = 0; i < 10; i++) {
-    // XYZ
-    vtx_info.emplace_back(std::cos(theta) * raio);
-    vtx_info.emplace_back(0.5f);
-    vtx_info.emplace_back(std::sin(theta) * raio);
+  std::vector <float> vtx_info;
+  for(int i = 0; i < 10; i++){
+    //XYZ
+    vtx_info.emplace_back(std::cos(theta) * raio);      vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(std::sin(theta) * raio);
+    //UV
+    vtx_info.emplace_back(i / 10);                      vtx_info.emplace_back(1.0f);
+    //RGBA
+    vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
+    //Normal
+    glm::vec3 normal = glm::normalize(glm::vec3(std::cos(theta), 0.0f, std::sin(theta)));
+    vtx_info.emplace_back(normal[0]);                   vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
+
     theta += 2 * PI / 10;
   }
   theta = 0.0f;
-  // Círculo superior
-  for (int i = 0; i < 10; i++) {
-    // XYZ
-    vtx_info.emplace_back(std::cos(theta) * raio);
-    vtx_info.emplace_back(-0.5f);
-    vtx_info.emplace_back(std::sin(theta) * raio);
+  for(int i = 0; i < 10; i++){
+    //XYZ
+    vtx_info.emplace_back(std::cos(theta) * raio);      vtx_info.emplace_back(-0.5f);         vtx_info.emplace_back(std::sin(theta) * raio);
+    //UV
+    vtx_info.emplace_back(i / 10);                      vtx_info.emplace_back(0.0f);
+    //RGB
+    vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
+    //Normal
+    glm::vec3 normal = glm::normalize(glm::vec3(std::cos(theta), 0.0f, std::sin(theta)));
+    vtx_info.emplace_back(normal[0]);           vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
+
     theta += 2 * PI / 10;
   }
   m_Layout.Push<float>(3, "Vertex Coordinates");
+  m_Layout.Push<float>(2, "Texture Coordinates");
+  m_Layout.Push<float>(4, "Vertex Colors");
+  m_Layout.Push<float>(3, "Vertex Normals");
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
             GL_STATIC_DRAW);
   std::vector<int> indices;
@@ -556,6 +580,8 @@ void CGRACylinder::drawIt(glm::mat4 V, glm::mat4 P) {
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   SetUniform4f(color, "u_Colors");
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  if(hasTexture)
+    glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 

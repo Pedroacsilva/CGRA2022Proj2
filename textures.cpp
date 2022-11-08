@@ -1,6 +1,4 @@
 // Textures
-
-
 #include "Camera.cpp"
 /*#include "compoundObjects.cpp"
 #include "compoundObjects.hpp"*/

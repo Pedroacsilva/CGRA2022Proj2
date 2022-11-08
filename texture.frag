@@ -8,8 +8,14 @@ out vec4 f_Color;
 
 void main(){
     vec4 texColor = texture(u_Texture, v_TexCoords);
-    if (texColor.rgb == vec3(0.0f, 0.0f, 0.0f))
+    if (texColor.rgb == vec3(0.0f, 0.0f, 0.0f)){
         f_Color = vec4(v_TexCoords.xy, 0.0f, 1.0f);
+        if (f_Color == vec4(0.0f, 0.0f, 0.0f, 1.0f)) {
+            f_Color = v_Color;
+        }
+    }
     else
-        f_Color = texColor * vec4(1.0f, 1.0f, 1.0f, 0.2);
+        f_Color = min(vec4(1.0f, 1.0f, 1.0f, 1.0f), texColor * vec4(1.0f, 1.0f, 1.0f, 0.2));
+
+//    f_Color = vec4(v_TexCoords.xy, 0.0f, 1.0f);
 }

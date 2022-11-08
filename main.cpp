@@ -1,6 +1,5 @@
 #include "Camera.cpp"
-/*#include "compoundObjects.cpp"
-#include "compoundObjects.hpp"*/
+
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/glm.hpp"
@@ -221,7 +220,7 @@ int main(int argc, char const *argv[]) {
 
   basicShader = new DEECShader;
   std::cout << "loading shaders.\n";
-  if (basicShader->loadShaders("basic.vert", "basic.frag") == GL_FALSE) {
+  if (basicShader->loadShaders("texture.vert", "texture.frag") == GL_FALSE) {
     printf("ERROR LOADING SHADERS.\n");
     exit(EXIT_FAILURE);
   }
@@ -284,6 +283,13 @@ int main(int argc, char const *argv[]) {
   CGRAExtrusion trophy(extrPontos);
   CGRARevolution cone2(conePontos);
 
+  carroCorpo.setTexture("carrotexture.ppm");
+  sol.setTexture("tattoo.ppm");
+//  arvoreTronco.setTexture("trunktexture.ppm");
+//  arvoreFolhas.setTexture("treetexture.ppm");
+//  arvoreTronco.setChessTexture(true);
+//  sol.setChessTexture(true);
+  pneu.setChessTexture(true);
   track.setShader(basicShader);
   cartaz.setShader(basicShader);
   trophy.setShader(basicShader);
