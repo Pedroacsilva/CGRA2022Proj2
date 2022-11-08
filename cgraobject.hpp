@@ -1,5 +1,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "deecshader.h"
+#include "cgraimage.h"
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,6 +49,7 @@ public:
   VertexBufferLayout m_Layout;
   IndexBuffer m_IB;
   GLuint numVertices;
+  GLuint textureID;
   bool hasTexture;
 
   CGRAobject();
@@ -60,6 +62,8 @@ public:
   void Unbind() const;
   void AddVA(const VertexArray va);
   void AddIndexBuffer(const void *data, unsigned int count);
+  void setTexture(const char *,bool filterlinear=false);
+  void setChessTexture(bool filterlinear=false);
   virtual void drawIt(glm::mat4 V, glm::mat4 P);
 };
 

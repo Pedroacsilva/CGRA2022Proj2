@@ -52,6 +52,76 @@ void CGRAobject::SetUniform4f(glm::vec4 data, std::string uniformName) {
 }
 void CGRAobject::SetColor(glm::vec4 in_color) { color = in_color; }
 
+void CGRAobject::setChessTexture(bool filterlinear) {
+  // Create one OpenGL texture
+
+  // our image will be composed of a 2 by 2 pixels black and white checkerboard
+  //  note: opengl by default uses 32bits per pixel unless it is changed with
+  // glPixelStorei(GL_UNPACK_ALIGNMENT, #)
+  static unsigned char data[] = {255, 255, 255, 0, 0,   0,   0,   0,
+                                 0,   0,   0,   0, 255, 255, 255, 0};
+
+  glGenTextures(1, &textureID);
+
+  // All future texture functions will apply to this texture
+
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  // Pass the image ( data ) to OpenGL
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  if (!filterlinear)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  else
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+
+  // float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+  //  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+               data);
+
+  glGenerateMipmap(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  hasTexture = true;
+}
+
+void CGRAobject::setTexture(const char *fname, bool filterlinear) {
+  CGRAimage img;
+  if (!img.loadPPM(fname)) {
+    printf("(SET TEXTURE) Erro a abrir PPM.\n");
+    return;
+  }
+  glGenTextures(1, &textureID);
+
+  // All future texture functions will apply to this texture
+
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  // Pass the image ( data ) to OpenGL
+  //    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+  //  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+  if (!filterlinear)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  else
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+
+  // glPixelStorei(GL_PACK_ALIGNMENT,1);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.width, img.height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, img.data);
+
+  glGenerateMipmap(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  hasTexture = true;
+}
+
 void CGRAobject::drawIt(glm::mat4 V, glm::mat4 P) {}
 
 /*--------------------------+
@@ -102,7 +172,7 @@ void CGRACompound::PropagateModelTransformation(glm::mat4 &modeltransf) {
 CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
   std::vector<float> vtx_info;
   unsigned int numPontos = pontos.size();
-//  std::cout << "num de pontos: " << numPontos << "\n";
+  //  std::cout << "num de pontos: " << numPontos << "\n";
   float x_new = 0.0f, y_new = 0.0f, z_new = 0.0f, x, y, z;
   // Push dos pontos iniciais
   for (const auto &elemt : pontos) {
@@ -131,15 +201,15 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     indices.emplace_back((i + 1) % numPontos +
                          numPontos); // Entre [numPontos, 2 * numPontos - 1]
 
-/*    std::cout << "i = " << i << ": " << i << ", " << i + numPontos << ", "
-              << i + 1 + numPontos << "\t";*/
+    /*    std::cout << "i = " << i << ": " << i << ", " << i + numPontos << ", "
+                  << i + 1 + numPontos << "\t";*/
 
     indices.emplace_back(i);                   // Entre [0, numPontos]
     indices.emplace_back((i + 1) % numPontos); // Entre [0, numPontos]
     indices.emplace_back(((i + 1) % numPontos) +
                          numPontos); // Entre [numPontos, 2* numPontos - 1]
-/*    std::cout << "i = " << i << ": " << i << ", " << ((i + 1) % numPontos)
-              << ", " << ((i + 1) % numPontos) + numPontos << "\n";*/
+    /*    std::cout << "i = " << i << ": " << i << ", " << ((i + 1) % numPontos)
+                  << ", " << ((i + 1) % numPontos) + numPontos << "\n";*/
   }
 
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
@@ -289,36 +359,36 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
 
 CGRACube::CGRACube() {
   float face_positions[] = {
-      // Vertex Coordinates
-      -0.5f, -0.5f, -0.5f, // 0
-      0.5f, -0.5f, -0.5f,  // 1
-      0.5f, 0.5f, -0.5f,   // 2
-      -0.5f, 0.5f, -0.5f,  // 3
-      //---------------------//
-      -0.5f, -0.5f, 0.5f, // 4
-      0.5f, -0.5f, 0.5f,  // 5
-      0.5f, 0.5f, 0.5f,   // 6
-      -0.5f, 0.5f, 0.5f,  // 7
-      //---------------------//
-      0.5f, -0.5f, 0.5f,  // 8
-      0.5f, -0.5f, -0.5f, // 9
-      0.5f, 0.5f, -0.5f,  // 10
-      0.5f, 0.5f, 0.5f,   // 11
-      //---------------------//
-      -0.5f, -0.5f, 0.5f,  // 12
-      -0.5f, -0.5f, -0.5f, // 13
-      -0.5f, 0.5f, -0.5f,  // 14
-      -0.5f, 0.5f, 0.5f,   // 15
-      //---------------------//
-      -0.5f, 0.5f, 0.5f,  // 16
-      0.5f, 0.5f, 0.5f,   // 17
-      0.5f, 0.5f, -0.5f,  // 18
-      -0.5f, 0.5f, -0.5f, // 19
-      //---------------------//
-      -0.5f, -0.5f, 0.5f,  // 20
-      0.5f, -0.5f, 0.5f,   // 21
-      0.5f, -0.5f, -0.5f,  // 22
-      -0.5f, -0.5f, -0.5f, // 23
+      // Vertex Coordinates  Tex Coords       RGBA  Values       Normals
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f,// 0
+      0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, -1.0f,// 1
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 0.0f, -1.0f,// 2
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, -1.0f,// 3
+      //-----------------------------------------------------------------------------
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, // 4
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, 1.0f, // 5
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 0.0f, 1.0f, // 6
+      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, 1.0f, // 7
+      //-----------------------------------------------------------------------------
+      0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  1.0f, 0.0f, 0.0f,// 8
+      0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f,// 9
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  1.0f, 0.0f, 0.0f,// 10
+      0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,   1.0f, 0.0f, 0.0f,// 11
+      //-----------------------------------------------------------------------------
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f, // 12
+      -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,-1.0f, 0.0f, 0.0f, // 13
+      -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, -1.0f, 0.0f, 0.0f, // 14
+      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  -1.0f, 0.0f, 0.0f, // 15
+      //-----------------------------------------------------------------------------
+      -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 1.0f, 0.0f,// 16
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 1.0f, 0.0f,// 17
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 1.0f, 0.0f,// 18
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f,// 19
+      //-----------------------------------------------------------------------------
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f,// 20
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,  0.0f, -1.0f, 0.0f,// 21
+      0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f,// 22
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f// 23
   };
 
   unsigned int indices[] = {0,  1,  2,  2,  3,  0,  4,  5,  6,  6,  7,  4,
@@ -329,6 +399,9 @@ CGRACube::CGRACube() {
             GL_STATIC_DRAW);
   m_IB.Push(indices, 6 * 6);
   m_Layout.Push<float>(3, "Vertex Coordinates");
+  m_Layout.Push<float>(2, "Texture Coordinates");
+  m_Layout.Push<float>(4, "Vertex Colors");
+  m_Layout.Push<float>(3, "Vertex Normals");
   m_VA.AddBuffer(m_VB, m_Layout);
 }
 
@@ -341,6 +414,8 @@ void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   SetUniform4f(color, "u_Colors");
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  if(hasTexture)
+    glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
