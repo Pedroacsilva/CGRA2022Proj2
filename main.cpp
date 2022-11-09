@@ -72,7 +72,7 @@ float yaw = -90.0f;
 // float lastX = 400, lastY = 300, yaw = -90.0f, pitch = 0.0f;
 float deltaTime = 0.0f, lastFrame = 0.0f;
 bool firstMouse = true;
-float cameraSpeed = 1.0f;
+float cameraSpeed = 4.0f;
 
 /*void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
                  int mods) {
@@ -116,7 +116,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
     camera.m_Position -= camera.m_Front * cameraSpeed * deltaTime;
 
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_TRUE) {
-    yaw -= cameraSpeed * deltaTime * 80;
+    yaw -= cameraSpeed * deltaTime * 40;
     glm::vec3 direction(1.0f);
     direction[0] = cos(glm::radians(yaw));
     direction[1] = 0.0f;
@@ -285,6 +285,7 @@ int main(int argc, char const *argv[]) {
 
   carroCorpo.setTexture("carrotexture.ppm");
   sol.setTexture("tattoo.ppm");
+  arvoreFolhas.setTexture("treetexture.ppm");
 //  arvoreTronco.setTexture("trunktexture.ppm");
 //  arvoreFolhas.setTexture("treetexture.ppm");
 //  arvoreTronco.setChessTexture(true);

@@ -351,6 +351,7 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniform4f(color, "u_Colors");
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*--------------------------+
@@ -417,6 +418,7 @@ void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*--------------------------+
@@ -505,6 +507,7 @@ void CGRASphere::drawIt(glm::mat4 V, glm::mat4 P) {
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*--------------------------+
@@ -583,6 +586,7 @@ void CGRACylinder::drawIt(glm::mat4 V, glm::mat4 P) {
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*--------------------------+
@@ -595,46 +599,64 @@ CGRACone::CGRACone() {
   float theta = 0.0f;
   std::vector<float> vtx_info;
   // Vértice ápice primeiro (índice 0)
+  // XYZ
   vtx_info.emplace_back(0.0f);
   vtx_info.emplace_back(1.0f);
   vtx_info.emplace_back(0.0f);
-
+  // UV
+  vtx_info.emplace_back(0.0f);
+  vtx_info.emplace_back(1.0f);
+  // RGBA
+  vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
+  // Normais -- idk, versor y?
+  vtx_info.emplace_back(0.0f);
+  vtx_info.emplace_back(1.0f);
+  vtx_info.emplace_back(0.0f);
   // Vértices do círculo no chao (x e z variam, y = 0.0f)
   for (int i = 0; i < 10; i++) {
     // XYZ
     vtx_info.emplace_back(std::cos(theta) * raio);
     vtx_info.emplace_back(-0.5f);
     vtx_info.emplace_back(std::sin(theta) * raio);
+    //UV
+    vtx_info.emplace_back(i / 9);                      vtx_info.emplace_back(0.0f);
+    //RGBA
+    vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
+    //Normal
+    glm::vec3 normal = glm::normalize(glm::vec3(std::cos(theta), 0.0f, std::sin(theta)));
+    vtx_info.emplace_back(normal[0]);                   vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
     theta += 2 * PI / 10;
+    std::cout << "Theta: " << theta << "\n";
   }
   theta = 0.0f;
-  for (int i = 0; i < 10; i++) {
-    // XYZ
-    vtx_info.emplace_back(std::cos(theta) * raio);
-    vtx_info.emplace_back(-0.5f);
-    vtx_info.emplace_back(std::sin(theta) * raio);
-    theta += 2 * PI / 10;
-  }
   m_Layout.Push<float>(3, "Vertex Coordinates");
+  m_Layout.Push<float>(2, "Texture Coordinates");
+  m_Layout.Push<float>(4, "Vertex Colors");
+  m_Layout.Push<float>(3, "Vertex Normals");
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
             GL_STATIC_DRAW);
   std::vector<int> indices;
   // Ligar vértice ápice aos do chão
-  for (int i = 0; i < 10; i++) {
+  for(int i = 0; i < 9; i++){
+    indices.emplace_back(0);
+    indices.emplace_back(i + 1);
+    indices.emplace_back(i + 2);
+  }
+  indices.emplace_back(0);
+  indices.emplace_back(10);
+  indices.emplace_back(1);
+/*  for (int i = 0; i < 10; i++) {
     indices.emplace_back(0);
     indices.emplace_back(i + 1);
     indices.emplace_back(i + 10);
-    indices.emplace_back(0);
-    indices.emplace_back(i + 1);
-    indices.emplace_back(i + 11);
-  }
+  }*/
   // Caso degenerado
-  indices.pop_back();
+/*  indices.pop_back();
   indices.pop_back();
   indices.pop_back();
   indices.emplace_back(0);
   indices.emplace_back(9);
-  indices.emplace_back(10);
+  indices.emplace_back(10);*/
 
   m_IB.Push(indices.data(), indices.size());
   m_VA.AddBuffer(m_VB, m_Layout);
@@ -650,5 +672,8 @@ void CGRACone::drawIt(glm::mat4 V, glm::mat4 P) {
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
   SetUniform4f(color, "u_Colors");
+  if(hasTexture)
+    glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
