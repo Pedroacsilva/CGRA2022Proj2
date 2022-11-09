@@ -109,6 +109,8 @@ void CGRAobject::setTexture(const char *fname, bool filterlinear) {
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   // glPixelStorei(GL_PACK_ALIGNMENT,1);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -242,9 +244,9 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
   const float thetaStep = 2 * PI / 10;
   float theta = 0.0f;
   std::vector<float> vtx_info;
-  float x_new = 0.0f, y_new = 0.0f, x, y, z;
+  float x_new = 0.0f, y_new = 0.0f, z_new = 0.0f, x, y, z;
   // Aplicar 10 rotações ao redor do eixo z aos pontos recebidos.
-  for (int i = 0; i < 10; i++) {
+/*  for (int i = 0; i < 10; i++) {
     for (const auto &elemt : pontos) {
       x = elemt[0];
       y = elemt[1];
@@ -254,6 +256,21 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
       vtx_info.emplace_back(x_new);
       vtx_info.emplace_back(y_new);
       vtx_info.emplace_back(z);
+    }
+    theta += thetaStep;
+  }*/
+  x_new = 0.0f; y_new = 0.0f; z_new = 0.0f;
+    // Aplicar 10 rotações ao redor do eixo y aos pontos recebidos.
+  for (int i = 0; i < 10; i++) {
+    for (const auto &elemt : pontos) {
+      x = elemt[0];
+      y = elemt[1];
+      z = elemt[2];
+      x_new = static_cast<float>(std::cos(theta) * x + std::sin(theta) * z);
+      z_new = static_cast<float>(-1 * std::sin(theta) * x + std::cos(theta) * z);
+      vtx_info.emplace_back(x_new);
+      vtx_info.emplace_back(y);
+      vtx_info.emplace_back(z_new);
     }
     theta += thetaStep;
   }
@@ -326,10 +343,14 @@ void CGRARevolution::drawIt(glm::mat4 V, glm::mat4 P) {
 CGRASquare::CGRASquare() {
   float face_positions[] = {
       // Vertex Coordinates
-      -0.5f, -0.5f, 0.0f, // 0
+/*      -0.5f, -0.5f, 0.0f, // 0
       0.5f,  -0.5f, 0.0f, // 1
       0.5f,  0.5f,  0.0f, // 2
-      -0.5f, 0.5f,  0.0f  // 3
+      -0.5f, 0.5f,  0.0f  // 3*/
+      -0.5f, 0.0f, -0.5f, // 0
+      0.5f,  0.0f, -0.5f, // 1
+      0.5f,  0.0f,  0.5f, // 2
+      -0.5f, 0.0f,  0.5f  // 3
   };
 
   unsigned int indices[] = {0, 1, 2, 2, 3, 0};
@@ -350,9 +371,10 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   SetUniform4f(color, "u_Colors");
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  if(hasTexture)
+    glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
-  glBindTexture(GL_TEXTURE_2D, 0);
-}
+  glBindTexture(GL_TEXTURE_2D, 0);}
 
 /*--------------------------+
 |         Cubo              |
@@ -523,7 +545,7 @@ CGRACylinder::CGRACylinder() {
     //XYZ
     vtx_info.emplace_back(std::cos(theta) * raio);      vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(std::sin(theta) * raio);
     //UV
-    vtx_info.emplace_back(i / 10);                      vtx_info.emplace_back(1.0f);
+    vtx_info.emplace_back(2 * i / 9);                      vtx_info.emplace_back(1.0f);
     //RGBA
     vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
     //Normal
@@ -537,7 +559,7 @@ CGRACylinder::CGRACylinder() {
     //XYZ
     vtx_info.emplace_back(std::cos(theta) * raio);      vtx_info.emplace_back(-0.5f);         vtx_info.emplace_back(std::sin(theta) * raio);
     //UV
-    vtx_info.emplace_back(i / 10);                      vtx_info.emplace_back(0.0f);
+    vtx_info.emplace_back(2 * i / 9);                      vtx_info.emplace_back(0.0f);
     //RGB
     vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
     //Normal
@@ -598,9 +620,51 @@ CGRACone::CGRACone() {
   const float PI = 3.14f;
   float theta = 0.0f;
   std::vector<float> vtx_info;
+
+  for(int i = 0; i < 10; i++){
+    //XYZ
+    vtx_info.emplace_back(0.0f);      vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.0f);
+    //UV
+    vtx_info.emplace_back(i / 9);                      vtx_info.emplace_back(1.0f);
+    //RGBA
+    vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
+    //Normal
+    glm::vec3 normal = glm::normalize(glm::vec3(std::cos(theta), 0.0f, std::sin(theta)));
+    vtx_info.emplace_back(normal[0]);                   vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
+    theta += 2 * PI / 10;
+  }
+  theta = 0.0f;
+  for(int i = 0; i < 10; i++){
+    //XYZ
+    vtx_info.emplace_back(std::cos(theta) * raio);      vtx_info.emplace_back(-0.5f);         vtx_info.emplace_back(std::sin(theta) * raio);
+    //UV
+    vtx_info.emplace_back(i / 9);                      vtx_info.emplace_back(0.0f);
+    //RGB
+    vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
+    //Normal
+    glm::vec3 normal = glm::normalize(glm::vec3(std::cos(theta), 0.0f, std::sin(theta)));
+    vtx_info.emplace_back(normal[0]);           vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
+
+    theta += 2 * PI / 10;
+  }
+  m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
+            GL_STATIC_DRAW);
+  m_Layout.Push<float>(3, "Vertex Coordinates");
+  m_Layout.Push<float>(2, "Texture Coordinates");
+  m_Layout.Push<float>(4, "Vertex Colors");
+  m_Layout.Push<float>(3, "Vertex Normals");
+
+  // Conectar indices
+  std::vector<int> indices;
+  for(int i = 0; i < 9; i++){
+    indices.emplace_back(i);
+    indices.emplace_back(i + 10);
+    indices.emplace_back(i + 11);
+  }
+  indices.emplace_back(9); indices.emplace_back(19); indices.emplace_back(10);
   // Vértice ápice primeiro (índice 0)
   // XYZ
-  vtx_info.emplace_back(0.0f);
+/*  vtx_info.emplace_back(0.0f);
   vtx_info.emplace_back(1.0f);
   vtx_info.emplace_back(0.0f);
   // UV
@@ -625,9 +689,7 @@ CGRACone::CGRACone() {
     //Normal
     glm::vec3 normal = glm::normalize(glm::vec3(std::cos(theta), 0.0f, std::sin(theta)));
     vtx_info.emplace_back(normal[0]);                   vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
-    theta += 2 * PI / 10;
-    std::cout << "Theta: " << theta << "\n";
-  }
+    theta += 2 * PI / 10;  }
   theta = 0.0f;
   m_Layout.Push<float>(3, "Vertex Coordinates");
   m_Layout.Push<float>(2, "Texture Coordinates");
@@ -644,7 +706,7 @@ CGRACone::CGRACone() {
   }
   indices.emplace_back(0);
   indices.emplace_back(10);
-  indices.emplace_back(1);
+  indices.emplace_back(1);*/
 /*  for (int i = 0; i < 10; i++) {
     indices.emplace_back(0);
     indices.emplace_back(i + 1);

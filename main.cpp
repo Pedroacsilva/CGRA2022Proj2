@@ -208,7 +208,7 @@ int main(int argc, char const *argv[]) {
   glfwSwapInterval(1);
   glfwSetKeyCallback(window, KeyCallback);
 
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   //  glfwSetCursorPosCallback(window, mouse_callback);
 
   if (glewInit() != GLEW_OK) {
@@ -277,7 +277,7 @@ int main(int argc, char const *argv[]) {
 
   std::vector<glm::vec3> conePontos;
   conePontos.emplace_back(1.0f, 0.0f, -1.0f);
-  conePontos.emplace_back(0.0f, 0.0f, 0.0f);
+  conePontos.emplace_back(0.0f, 1.0f, 0.0f);
 
   CGRARevolution track(revoPontos);
   CGRAExtrusion trophy(extrPontos);
@@ -286,11 +286,18 @@ int main(int argc, char const *argv[]) {
   carroCorpo.setTexture("carrotexture.ppm");
   sol.setTexture("tattoo.ppm");
   arvoreFolhas.setTexture("treetexture.ppm");
-//  arvoreTronco.setTexture("trunktexture.ppm");
+//  arvoreFolhas.setChessTexture(true);
+  arvoreTronco.setTexture("trunktexture.ppm");
 //  arvoreFolhas.setTexture("treetexture.ppm");
 //  arvoreTronco.setChessTexture(true);
 //  sol.setChessTexture(true);
-  pneu.setChessTexture(true);
+  pneu.setTexture("pneutexture.ppm");
+//  pneu.setChessTexture(true);
+  carroPneu.setTexture("pneutexture.ppm");
+  carroPneu2.setTexture("pneutexture.ppm");
+  carroPneu3.setTexture("pneutexture.ppm");
+  carroPneu4.setTexture("pneutexture.ppm");
+  cone.setTexture("conetexture.ppm");
   track.setShader(basicShader);
   cartaz.setShader(basicShader);
   trophy.setShader(basicShader);
@@ -324,26 +331,28 @@ int main(int argc, char const *argv[]) {
 
   // Deslocar objectos na cena.
 
+  cartazPosition = glm::rotate(cartazPosition, 1.6f, glm::vec3(1.0f, 0.0f, 0.0f));
   cartazPosition = glm::scale(cartazPosition, glm::vec3(5.0f, 2.5f, 3.0f));
-  cartazPosition = glm::translate(cartazPosition, glm::vec3(1.5f, 0.0f, -2.0f));
-  cartazPosition = glm::rotate(cartazPosition, glm::degrees(120.0f),
-                               glm::vec3(0.0f, 1.0f, 0.0f));
+  cartazPosition = glm::translate(cartazPosition, glm::vec3(0.0f, 0.0f, -2.0f));
+//  cartazPosition = glm::translate(cartazPosition, glm::vec3(1.5f, 0.0f, -2.0f));
+/*  cartazPosition = glm::rotate(cartazPosition, glm::degrees(120.0f),
+                               glm::vec3(0.0f, 1.0f, 0.0f));*/
 
-  chaoPosition = glm::scale(chaoPosition, glm::vec3(15.0f, 15.0f, 15.0f));
-  chaoPosition = glm::rotate(chaoPosition, glm::degrees(90.0f),
-                             glm::vec3(1.0f, 0.0f, 0.0f));
+  chaoPosition = glm::scale(chaoPosition, glm::vec3(25.0f, 25.0f, 25.0f));
+/*  chaoPosition = glm::rotate(chaoPosition, glm::degrees(90.0f),
+                             glm::vec3(1.0f, 0.0f, 0.0f));*/
   chaoPosition = glm::translate(chaoPosition, glm::vec3(0.0f, 0.0f, -0.001f));
 
-  solPosition = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 8.0f, -5.0f));
+  solPosition = glm::translate(glm::mat4(1.0f), glm::vec3(6.0f, 8.0f, -5.0f));
 
   std::vector<glm::vec3> pneuLocations = {glm::vec3(0.0f, 0.0f, 0.0f),
                                           glm::vec3(1.0f, 0.0f, 0.0f),
                                           glm::vec3(1.0f, 1.0f, 0.0f)};
 
   std::vector<glm::vec3> coneLocations = {
-      glm::vec3(5.9f, -0.4f, -3.0f), glm::vec3(5.9f, 0.0f, -1.5f),
-      glm::vec3(5.9f, 0.0f, 0.0f), glm::vec3(5.9f, 0.5f, 1.5f),
-      glm::vec3(5.9f, 0.75f, 3.0f)};
+      glm::vec3(5.9f, 1.0f, -3.0f), glm::vec3(5.9f, 1.0f, -1.5f),
+      glm::vec3(5.9f, 1.0f, 0.0f), glm::vec3(5.9f, 1.0f, 1.5f),
+      glm::vec3(5.9f, 1.0f, 3.0f)};
 
   pneuPosition = glm::scale(pneuPosition, glm::vec3(0.6f, 0.1f, 0.2f));
   pneuPosition = glm::translate(pneuPosition, glm::vec3(-1.0f, 1.5f, 0.0f));
@@ -353,21 +362,21 @@ int main(int argc, char const *argv[]) {
 
   cone2Position = glm::scale(cone2Position, glm::vec3(0.3f, 0.7f, 0.3f));
   cone2Position = glm::translate(cone2Position, glm::vec3(-5.0f, 0.7f, 0.0f));
-  cone2Position = glm::rotate(cone2Position, glm::degrees(90.0f),
-                              glm::vec3(1.0f, 0.0f, 0.0f));
+/*  cone2Position = glm::rotate(cone2Position, glm::degrees(90.0f),
+                              glm::vec3(1.0f, 0.0f, 0.0f));*/
 
   trackPosition =
-      glm::translate(trackPosition, glm::vec3(0.0f, 0.00001f, 0.0f));
-  trackPosition = glm::rotate(trackPosition, glm::degrees(90.0f),
-                              glm::vec3(1.0f, 0.0f, 0.0f));
+      glm::translate(trackPosition, glm::vec3(0.0f, 0.01f, 0.0f));
+/*  trackPosition = glm::rotate(trackPosition, glm::degrees(90.0f),
+                              glm::vec3(1.0f, 0.0f, 0.0f));*/
   trackPosition = glm::scale(trackPosition, glm::vec3(5.0f, 5.0f, 5.0f));
 
-  trophyPosition = glm::translate(trophyPosition, glm::vec3(0.0f, 1.0f, -1.5f));
+  trophyPosition = glm::translate(trophyPosition, glm::vec3(0.0f, 1.1f, -1.5f));
 
   carroCorpoPosition =
-      glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
+      glm::translate(carroCorpoPosition, glm::vec3(3.0f, 1.0f, 0.0f));
   carro2CorpoPosition =
-      glm::translate(carro2CorpoPosition, glm::vec3(7.0f, 1.0f, -2.0f));
+      glm::translate(carro2CorpoPosition, glm::vec3(5.0f, 1.0f, -2.0f));
 
   // Pneus do carro
 
@@ -389,15 +398,15 @@ int main(int argc, char const *argv[]) {
   carro2CorpoObj.PushChild(&carro2Pneu2Obj, pneu22corpo);
 
   arvoreFolhasPosition =
-      glm::translate(arvoreFolhasPosition, glm::vec3(0.0f, 1.2f, 0.0f));
-  arvoreFolhasPosition =
       glm::scale(arvoreFolhasPosition, glm::vec3(4.5f, 1.5f, 1.0f));
+  arvoreFolhasPosition =
+      glm::translate(arvoreFolhasPosition, glm::vec3(0.0f, 0.7f, 0.0f));
 
   // Conectar folhas da árvore ao tronco.
   arvoreTroncoObj.PushChild(&arvoreFolhasObj, arvoreFolhasPosition);
 
   arvoreTroncoPosition =
-      glm::translate(arvoreTroncoPosition, glm::vec3(-7.0f, 0.3f, 0.0f));
+      glm::translate(arvoreTroncoPosition, glm::vec3(-7.0f, 0.6f, -5.0f));
   arvoreTroncoPosition =
       glm::scale(arvoreTroncoPosition, glm::vec3(0.3f, 1.0f, 1.0f));
 
@@ -467,7 +476,7 @@ int main(int argc, char const *argv[]) {
     glm::mat4 carrosPos(1.0f);
     // Incrementar rotação dos carros
     carrosPos = glm::rotate(carrosPos, glm::degrees(0.0001f),
-                            glm::vec3(0.0f, 1.0f, -0.2f));
+                            glm::vec3(0.0f, 1.0f, 0.0f));
 
     // Obter posição do piloto (e incrementar y um bocado)
     driverPosition = GetTranslationFromMat4(carroCorpoObj.Object->modeltr);
