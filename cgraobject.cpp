@@ -625,7 +625,7 @@ CGRACone::CGRACone() {
     //XYZ
     vtx_info.emplace_back(0.0f);      vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.0f);
     //UV
-    vtx_info.emplace_back(i / 9);                      vtx_info.emplace_back(1.0f);
+    vtx_info.emplace_back(i / 10.0f);                      vtx_info.emplace_back(1.0f);
     //RGBA
     vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
     //Normal
@@ -638,7 +638,7 @@ CGRACone::CGRACone() {
     //XYZ
     vtx_info.emplace_back(std::cos(theta) * raio);      vtx_info.emplace_back(-0.5f);         vtx_info.emplace_back(std::sin(theta) * raio);
     //UV
-    vtx_info.emplace_back(i / 9);                      vtx_info.emplace_back(0.0f);
+    vtx_info.emplace_back(static_cast<float>(i / 10.0f));                      vtx_info.emplace_back(0.0f);
     //RGB
     vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
     //Normal
@@ -646,6 +646,8 @@ CGRACone::CGRACone() {
     vtx_info.emplace_back(normal[0]);           vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
 
     theta += 2 * PI / 10;
+
+    std::cout << "Base: (u, v) -> (" << static_cast<float>(i / 9.0f) << ", " << 0.0f << ").\n";
   }
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
             GL_STATIC_DRAW);
@@ -662,63 +664,6 @@ CGRACone::CGRACone() {
     indices.emplace_back(i + 11);
   }
   indices.emplace_back(9); indices.emplace_back(19); indices.emplace_back(10);
-  // Vértice ápice primeiro (índice 0)
-  // XYZ
-/*  vtx_info.emplace_back(0.0f);
-  vtx_info.emplace_back(1.0f);
-  vtx_info.emplace_back(0.0f);
-  // UV
-  vtx_info.emplace_back(0.0f);
-  vtx_info.emplace_back(1.0f);
-  // RGBA
-  vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
-  // Normais -- idk, versor y?
-  vtx_info.emplace_back(0.0f);
-  vtx_info.emplace_back(1.0f);
-  vtx_info.emplace_back(0.0f);
-  // Vértices do círculo no chao (x e z variam, y = 0.0f)
-  for (int i = 0; i < 10; i++) {
-    // XYZ
-    vtx_info.emplace_back(std::cos(theta) * raio);
-    vtx_info.emplace_back(-0.5f);
-    vtx_info.emplace_back(std::sin(theta) * raio);
-    //UV
-    vtx_info.emplace_back(i / 9);                      vtx_info.emplace_back(0.0f);
-    //RGBA
-    vtx_info.emplace_back(0.5f);                        vtx_info.emplace_back(0.5f);          vtx_info.emplace_back(0.5f);            vtx_info.emplace_back(1.0f);
-    //Normal
-    glm::vec3 normal = glm::normalize(glm::vec3(std::cos(theta), 0.0f, std::sin(theta)));
-    vtx_info.emplace_back(normal[0]);                   vtx_info.emplace_back(normal[1]);     vtx_info.emplace_back(normal[2]);
-    theta += 2 * PI / 10;  }
-  theta = 0.0f;
-  m_Layout.Push<float>(3, "Vertex Coordinates");
-  m_Layout.Push<float>(2, "Texture Coordinates");
-  m_Layout.Push<float>(4, "Vertex Colors");
-  m_Layout.Push<float>(3, "Vertex Normals");
-  m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
-            GL_STATIC_DRAW);
-  std::vector<int> indices;
-  // Ligar vértice ápice aos do chão
-  for(int i = 0; i < 9; i++){
-    indices.emplace_back(0);
-    indices.emplace_back(i + 1);
-    indices.emplace_back(i + 2);
-  }
-  indices.emplace_back(0);
-  indices.emplace_back(10);
-  indices.emplace_back(1);*/
-/*  for (int i = 0; i < 10; i++) {
-    indices.emplace_back(0);
-    indices.emplace_back(i + 1);
-    indices.emplace_back(i + 10);
-  }*/
-  // Caso degenerado
-/*  indices.pop_back();
-  indices.pop_back();
-  indices.pop_back();
-  indices.emplace_back(0);
-  indices.emplace_back(9);
-  indices.emplace_back(10);*/
 
   m_IB.Push(indices.data(), indices.size());
   m_VA.AddBuffer(m_VB, m_Layout);

@@ -251,7 +251,7 @@ int main(int argc, char const *argv[]) {
   glm::mat4 proj = glm::perspective(glm::radians(80.0f), 1.0f, 0.5f, 30.0f);
 
   // Declarar objectos
-  CGRACube cubo;
+  CGRACone cubo;
   
 
 

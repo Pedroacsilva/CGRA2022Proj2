@@ -285,7 +285,7 @@ int main(int argc, char const *argv[]) {
 
   carroCorpo.setTexture("carrotexture.ppm");
   sol.setTexture("tattoo.ppm");
-  arvoreFolhas.setTexture("treetexture.ppm");
+  arvoreFolhas.setTexture("treetexture3.ppm");
 //  arvoreFolhas.setChessTexture(true);
   arvoreTronco.setTexture("trunktexture.ppm");
 //  arvoreFolhas.setTexture("treetexture.ppm");
