@@ -268,9 +268,17 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
       z = elemt[2];
       x_new = static_cast<float>(std::cos(theta) * x + std::sin(theta) * z);
       z_new = static_cast<float>(-1 * std::sin(theta) * x + std::cos(theta) * z);
+      // XYZ
       vtx_info.emplace_back(x_new);
       vtx_info.emplace_back(y);
       vtx_info.emplace_back(z_new);
+      // UV
+      float v = (i % 2 == 0) ? 0.0f : 1.0f;
+      vtx_info.emplace_back(v);
+      vtx_info.emplace_back(i * 0.10f);
+      std::cout << "v = " << v << "\n";
+//      (i % 2 == 0) ? vtx_info.emplace_back(1.0f) : vtx_info.emplace_back(0.0f);
+//      std::cout << "Revo UV: " << i * 0.10f << ", " << v << "\n";
     }
     theta += thetaStep;
   }
@@ -319,6 +327,7 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
             GL_STATIC_DRAW);
   m_Layout.Push<float>(3, "Vertex Coordinates");
+  m_Layout.Push<float>(2, "Texture Coordinates");
   m_IB.Push(indices.data(), indices.size());
   m_VA.AddBuffer(m_VB, m_Layout);
 }
@@ -328,12 +337,14 @@ CGRARevolution::~CGRARevolution() {}
 void CGRARevolution::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
-
   glm::mat4 mvp = P * V * modeltr;
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
   SetUniform4f(color, "u_Colors");
+  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  if(hasTexture)
+    glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*--------------------------+
@@ -347,10 +358,10 @@ CGRASquare::CGRASquare() {
       0.5f,  -0.5f, 0.0f, // 1
       0.5f,  0.5f,  0.0f, // 2
       -0.5f, 0.5f,  0.0f  // 3*/
-      -0.5f, 0.0f, -0.5f, // 0
-      0.5f,  0.0f, -0.5f, // 1
-      0.5f,  0.0f,  0.5f, // 2
-      -0.5f, 0.0f,  0.5f  // 3
+      -0.5f, 0.0f, -0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 0
+      0.5f,  0.0f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 1
+      0.5f,  0.0f,  0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 2
+      -0.5f, 0.0f,  0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 3
   };
 
   unsigned int indices[] = {0, 1, 2, 2, 3, 0};
@@ -358,6 +369,9 @@ CGRASquare::CGRASquare() {
             GL_STATIC_DRAW);
   m_IB.Push(indices, 6);
   m_Layout.Push<float>(3, "Vertex Coordinates");
+  m_Layout.Push<float>(2, "Texture Coordinates");
+  m_Layout.Push<float>(4, "Vertex Colors");
+  m_Layout.Push<float>(3, "Vertex Normals");
   m_VA.AddBuffer(m_VB, m_Layout);
   setShader(shader);
 }
@@ -374,7 +388,8 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
-  glBindTexture(GL_TEXTURE_2D, 0);}
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 /*--------------------------+
 |         Cubo              |

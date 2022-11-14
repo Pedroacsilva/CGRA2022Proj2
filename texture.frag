@@ -16,7 +16,8 @@ void main(){
     }
     else
         //f_Color = min(vec4(1.0f, 1.0f, 1.0f, 1.0f), texColor * vec4(1.0f, 1.0f, 1.0f, 0.2));
-        f_Color = min(vec4(1.0f, 1.0f, 1.0f, 1.0f), texColor /** v_Color*/);
+        f_Color = min(vec4(1.0f, 1.0f, 1.0f, 1.0f), texColor * v_Color);
 
 //    f_Color = vec4(v_TexCoords.xy, 0.0f, 1.0f);
+        //f_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }
