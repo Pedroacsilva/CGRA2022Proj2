@@ -12,15 +12,17 @@ uniform vec3 u_LightColor;
 uniform vec3 u_LightPos;
 uniform vec3 u_CameraPosition;
 uniform float AmbientStrength;
+uniform float DirectionalDiffStrength;
+uniform float u_Shininess;
 out vec4 f_Color;
 
 void main(){
 
 //    float AmbientStrength = 0.8f;
 //    float DiffuseStrength = 1.0f;
-    float DirectionalDiffStrength = 0.1f;
+//    float DirectionalDiffStrength = 0.1f;
     float SpecularStrength = 0.1f;
-    float Shininess = 3.0f;
+    float Shininess = 1.0f;
     vec3 FragColor = vec3(1.0f);
     vec3 DirectionalLightDirection = vec3(1.0f, 0.0f, 0.0f);
   //  vec3 LightDirection = normalize(u_LightPos - v_FragPos);
@@ -45,8 +47,9 @@ void main(){
         vec3 ColorSum = AmbientReflectedComponent + DirectionalDiffuseComponent + SpecularLightComponent;
         //f_Color = min(vec4(1.0f), texColor * v_Color);
         f_Color = min(vec4(1.0f), vec4(ColorSum.rgb, 1.0f));
-//        f_Color.rgb = SpecularLightComponent;
+        f_Color.rgb = SpecularLightComponent;
     }
+//    f_Color.rgb = SpecularLightComponent;
       
 
 //    f_Color = vec4(v_TexCoords.xy, 0.0f, 1.0f);

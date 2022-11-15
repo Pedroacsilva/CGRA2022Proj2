@@ -51,10 +51,21 @@ void CGRAobject::SetUniform4f(glm::vec4 data, std::string uniformName) {
   glUniform4f(data_location, data[0], data[1], data[2], data[3]);
 }
 
+void CGRAobject::SetUniform1f(float data, std::string uniformName) 
+{
+    int data_location =
+      glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
+  glUniform1f(data_location, data);
+}
+
 void CGRAobject::SetUniformMat4f(glm::mat4 data, std::string uniformName) {
   int data_location =
       glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
   glUniformMatrix4fv(data_location, 1, GL_FALSE, &data[0][0]);
+}
+
+void CGRAobject::SetShininess(float data) {
+  shininess = data;
 }
 
 
@@ -133,6 +144,8 @@ void CGRAobject::setTexture(const char *fname, bool filterlinear) {
 }
 
 void CGRAobject::drawIt(glm::mat4 V, glm::mat4 P) {}
+
+
 
 /*--------------------------+
 |         Compostos         |
@@ -278,6 +291,7 @@ void CGRAExtrusion::drawIt(glm::mat4 V, glm::mat4 P) {
   glm::mat4 mvp = P * V * modeltr;
   SetUniformMat4f(mvp, "u_MVP");
   SetUniformMat4f(modeltr, "u_Model");
+  SetUniform1f(shininess, "u_Shininess");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
 //  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
@@ -393,6 +407,7 @@ void CGRARevolution::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniformMat4f(mvp, "u_MVP");
   SetUniformMat4f(modeltr, "u_Model");
   SetUniform4f(color, "u_Colors");
+  SetUniform1f(shininess, "u_Shininess");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -437,6 +452,7 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniform4f(color, "u_Colors");
   SetUniformMat4f(mvp, "u_MVP");
   SetUniformMat4f(modeltr, "u_Model");
+  SetUniform1f(shininess, "u_Shininess");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -504,6 +520,7 @@ void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniform4f(color, "u_Colors");
   SetUniformMat4f(mvp, "u_MVP");
   SetUniformMat4f(modeltr, "u_Model");
+  SetUniform1f(shininess, "u_Shininess");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -594,6 +611,7 @@ void CGRASphere::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniformMat4f(mvp, "u_MVP");
   SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
+  SetUniform1f(shininess, "u_Shininess");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -674,6 +692,7 @@ void CGRACylinder::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniform4f(color, "u_Colors");
   SetUniformMat4f(mvp, "u_MVP");
   SetUniformMat4f(modeltr, "u_Model");
+  SetUniform1f(shininess, "u_Shininess");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -749,8 +768,10 @@ void CGRACone::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniformMat4f(mvp, "u_MVP");
   SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
+  SetUniform1f(shininess, "u_Shininess");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
+
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
-  glBindTexture(GL_TEXTURE_2D, 0);
+//  glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -149,10 +149,12 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
   if (glfwGetKey(window, GLFW_KEY_N) == GLFW_TRUE){
     glClearColor(0.3f, 0.25f, 0.56f, 1.0f);
     SetUniform1f(0.1, "AmbientStrength", basicShader);
+    SetUniform1f(0.0, "DirectionalDiffStrength", basicShader);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_TRUE){
     glClearColor(0.53f, 0.8f, 0.92f, 1.0f);
     SetUniform1f(0.8, "AmbientStrength", basicShader);
+    SetUniform1f(0.1, "DirectionalDiffStrength", basicShader);
   }
 }
 
@@ -437,6 +439,8 @@ int main(int argc, char const *argv[]) {
   cartaz.SetColor(whiteColor);
   arvoreFolhas.SetColor(treeColor);
   arvoreTronco.SetColor(trunkColor);
+
+  carroCorpo.SetShininess(2.0f);
 
   // Preparar câmara para rastrear posição de um condutor.
   glm::vec3 cameraCarroPosition(1.0f);
