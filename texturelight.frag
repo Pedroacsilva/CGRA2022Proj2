@@ -11,14 +11,15 @@ uniform vec3 u_AmbientLightColor;
 uniform vec3 u_LightColor;
 uniform vec3 u_LightPos;
 uniform vec3 u_CameraPosition;
-
+uniform float AmbientStrength;
 out vec4 f_Color;
 
 void main(){
-    float AmbientStrength = 0.8f;
+
+//    float AmbientStrength = 0.8f;
 //    float DiffuseStrength = 1.0f;
-    float DirectionalDiffStrength = 0.8f;
-    float SpecularStrength = 0.5f;
+    float DirectionalDiffStrength = 0.1f;
+    float SpecularStrength = 0.1f;
     float Shininess = 3.0f;
     vec3 FragColor = vec3(1.0f);
     vec3 DirectionalLightDirection = vec3(1.0f, 0.0f, 0.0f);
