@@ -17,9 +17,9 @@ out vec4 f_Color;
 void main(){
     float AmbientStrength = 0.8f;
 //    float DiffuseStrength = 1.0f;
-    float DirectionalDiffStrength = 0.5f;
+    float DirectionalDiffStrength = 0.8f;
     float SpecularStrength = 0.5f;
-    float Shininess = 32.0f;
+    float Shininess = 3.0f;
     vec3 FragColor = vec3(1.0f);
     vec3 DirectionalLightDirection = vec3(1.0f, 0.0f, 0.0f);
   //  vec3 LightDirection = normalize(u_LightPos - v_FragPos);
@@ -40,11 +40,11 @@ void main(){
         FragColor = texColor.rgb * v_Color.rgb;
         vec3 AmbientReflectedComponent =  min(vec3(1.0f), FragColor * AmbientLight);
         vec3 DirectionalDiffuseComponent = min(vec3(1.0f), FragColor * DirectionalDiffDot * DirectionalDiffStrength);
-        vec3 SpecularLightComponent = min(vec3(1.0f), /*v_Color.rgb*/ AmbientLight * SpecularPower * SpecularStrength);
-        vec3 ColorSum = /*AmbientReflectedComponent + DirectionalDiffuseComponent*/ + SpecularLightComponent;
+        vec3 SpecularLightComponent = min(vec3(1.0f), /*v_Color.rgb*/ u_AmbientLightColor * SpecularPower * SpecularStrength);
+        vec3 ColorSum = AmbientReflectedComponent + DirectionalDiffuseComponent + SpecularLightComponent;
         //f_Color = min(vec4(1.0f), texColor * v_Color);
         f_Color = min(vec4(1.0f), vec4(ColorSum.rgb, 1.0f));
-        f_Color.rgb = SpecularLightComponent;
+//        f_Color.rgb = SpecularLightComponent;
     }
       
 

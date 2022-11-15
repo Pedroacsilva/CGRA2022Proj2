@@ -195,7 +195,8 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     vtx_info.emplace_back(elemt[2]);
     // UV
     vtx_info.emplace_back(u);
-    vtx_info.emplace_back(v);
+    vtx_info.emplace_back(0.0f);
+    std::cout << u << "\t" << v << "\n";
     // RGBA 
     vtx_info.emplace_back(0.5f);
     vtx_info.emplace_back(0.5f);
@@ -207,8 +208,9 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     vtx_info.emplace_back(0.0f);
     vtx_info.emplace_back(0.0f);
   }
+  u = - 1.0f / (numPontos - 1);
   for (const auto &elemt : pontos) {
-    v += 1.0f / (numPontos - 1);
+    u += 1.0f / (numPontos - 1);
 //    std::cout << "EXTRUSAO: v = " << v << "\n";
     x = elemt[0];
     y = elemt[1];
@@ -223,7 +225,8 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     vtx_info.emplace_back(z_new);
     // UV
     vtx_info.emplace_back(u);
-    vtx_info.emplace_back(v);
+    vtx_info.emplace_back(1.0);
+    std::cout << u << "\t" << v << "\n";
     // RGBA 
     vtx_info.emplace_back(0.5f);
     vtx_info.emplace_back(0.5f);
@@ -264,6 +267,7 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
   m_Layout.Push<float>(3, "Normals");
   m_IB.Push(indices.data(), indices.size());
   m_VA.AddBuffer(m_VB, m_Layout);
+  hasTexture = true;
 }
 
 CGRAExtrusion::~CGRAExtrusion() {}
@@ -274,6 +278,8 @@ void CGRAExtrusion::drawIt(glm::mat4 V, glm::mat4 P) {
   glm::mat4 mvp = P * V * modeltr;
   SetUniformMat4f(mvp, "u_MVP");
   SetUniformMat4f(modeltr, "u_Model");
+  if(hasTexture)
+    glBindTexture(GL_TEXTURE_2D, textureID);
 //  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   //  std::cout << "mvp_location: " << mvp_location << "\n";
 //  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);

@@ -138,6 +138,10 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
   }
   if (glfwGetKey(window, GLFW_KEY_V) == GLFW_TRUE)
     visitorPOV = !visitorPOV;
+  if(glfwGetKey(window, GLFW_KEY_N) == GLFW_TRUE)
+    glClearColor(0.3f, 0.25f, 0.56f, 1.0f);
+  if(glfwGetKey(window, GLFW_KEY_D) == GLFW_TRUE)
+    glClearColor(0.53f, 0.8f, 0.92f, 1.0f);
 }
 
 
