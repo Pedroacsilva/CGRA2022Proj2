@@ -50,6 +50,14 @@ void CGRAobject::SetUniform4f(glm::vec4 data, std::string uniformName) {
       glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
   glUniform4f(data_location, data[0], data[1], data[2], data[3]);
 }
+
+void CGRAobject::SetUniformMat4f(glm::mat4 data, std::string uniformName) {
+  int data_location =
+      glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
+  glUniformMatrix4fv(data_location, 1, GL_FALSE, &data[0][0]);
+}
+
+
 void CGRAobject::SetColor(glm::vec4 in_color) { color = in_color; }
 
 void CGRAobject::setChessTexture(bool filterlinear) {
@@ -176,13 +184,32 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
   unsigned int numPontos = pontos.size();
   //  std::cout << "num de pontos: " << numPontos << "\n";
   float x_new = 0.0f, y_new = 0.0f, z_new = 0.0f, x, y, z;
+  float u = - 1.0f / (numPontos - 1), v = -1.0f / (numPontos - 1);
   // Push dos pontos iniciais
   for (const auto &elemt : pontos) {
+    u += 1.0f / (numPontos - 1);
+//    std::cout << "EXTRUSAO: u = " << u << "\n";
+    // XYZ 
     vtx_info.emplace_back(elemt[0]);
     vtx_info.emplace_back(elemt[1]);
     vtx_info.emplace_back(elemt[2]);
+    // UV
+    vtx_info.emplace_back(u);
+    vtx_info.emplace_back(v);
+    // RGBA 
+    vtx_info.emplace_back(0.5f);
+    vtx_info.emplace_back(0.5f);
+    vtx_info.emplace_back(0.5f);
+    vtx_info.emplace_back(1.0f);
+    // Normals (?) (Teria de calcular a normal entre cada trio de pontos? Desta forma será complicado, oop. Terei de refactorar tudo!)
+    // PLACEHOLDER NORMALS
+    vtx_info.emplace_back(1.0f);
+    vtx_info.emplace_back(0.0f);
+    vtx_info.emplace_back(0.0f);
   }
   for (const auto &elemt : pontos) {
+    v += 1.0f / (numPontos - 1);
+//    std::cout << "EXTRUSAO: v = " << v << "\n";
     x = elemt[0];
     y = elemt[1];
     z = elemt[2];
@@ -190,9 +217,23 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     y_new = y;
     z_new = z + 1.0f;
     // Push novos vértices
+    // XYZ
     vtx_info.emplace_back(x_new);
     vtx_info.emplace_back(y_new);
     vtx_info.emplace_back(z_new);
+    // UV
+    vtx_info.emplace_back(u);
+    vtx_info.emplace_back(v);
+    // RGBA 
+    vtx_info.emplace_back(0.5f);
+    vtx_info.emplace_back(0.5f);
+    vtx_info.emplace_back(0.5f);
+    vtx_info.emplace_back(1.0f);
+    // Normals (?) (Teria de calcular a normal entre cada trio de pontos? Desta forma será complicado, oop. Terei de refactorar tudo!)
+    // PLACEHOLDER NORMALS
+    vtx_info.emplace_back(1.0f);
+    vtx_info.emplace_back(0.0f);
+    vtx_info.emplace_back(0.0f);
   }
 
   std::vector<unsigned int> indices;
@@ -218,6 +259,9 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
             GL_STATIC_DRAW);
 
   m_Layout.Push<float>(3, "Vertex Coordinates");
+  m_Layout.Push<float>(2, "Texture Coordinates");
+  m_Layout.Push<float>(4, "RGBA");
+  m_Layout.Push<float>(3, "Normals");
   m_IB.Push(indices.data(), indices.size());
   m_VA.AddBuffer(m_VB, m_Layout);
 }
@@ -228,9 +272,11 @@ void CGRAExtrusion::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
   glm::mat4 mvp = P * V * modeltr;
-  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
+  SetUniformMat4f(mvp, "u_MVP");
+  SetUniformMat4f(modeltr, "u_Model");
+//  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   //  std::cout << "mvp_location: " << mvp_location << "\n";
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+//  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
   SetUniform4f(color, "u_Colors");
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
@@ -244,7 +290,7 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
   const float thetaStep = 2 * PI / 10;
   float theta = 0.0f;
   std::vector<float> vtx_info;
-  float x_new = 0.0f, y_new = 0.0f, z_new = 0.0f, x, y, z;
+  float x_new = 0.0f, /*y_new = 0.0f,*/ z_new = 0.0f, x, y, z;
   // Aplicar 10 rotações ao redor do eixo z aos pontos recebidos.
 /*  for (int i = 0; i < 10; i++) {
     for (const auto &elemt : pontos) {
@@ -259,7 +305,7 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
     }
     theta += thetaStep;
   }*/
-  x_new = 0.0f; y_new = 0.0f; z_new = 0.0f;
+  x_new = 0.0f; /*y_new = 0.0f;*/ z_new = 0.0f;
     // Aplicar 10 rotações ao redor do eixo y aos pontos recebidos.
   for (int i = 0; i < 10; i++) {
     for (const auto &elemt : pontos) {
@@ -276,7 +322,7 @@ CGRARevolution::CGRARevolution(std::vector<glm::vec3> pontos) {
       float v = (i % 2 == 0) ? 0.0f : 1.0f;
       vtx_info.emplace_back(v);
       vtx_info.emplace_back(i * 0.10f);
-      std::cout << "v = " << v << "\n";
+//      std::cout << "v = " << v << "\n";
 //      (i % 2 == 0) ? vtx_info.emplace_back(1.0f) : vtx_info.emplace_back(0.0f);
 //      std::cout << "Revo UV: " << i * 0.10f << ", " << v << "\n";
     }
@@ -338,9 +384,9 @@ void CGRARevolution::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
   glm::mat4 mvp = P * V * modeltr;
-  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
+  SetUniformMat4f(mvp, "u_MVP");
+  SetUniformMat4f(modeltr, "u_Model");
   SetUniform4f(color, "u_Colors");
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -382,9 +428,9 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
   glm::mat4 mvp = P * V * modeltr;
-  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   SetUniform4f(color, "u_Colors");
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  SetUniformMat4f(mvp, "u_MVP");
+  SetUniformMat4f(modeltr, "u_Model");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -449,9 +495,9 @@ void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
   glm::mat4 mvp = P * V * modeltr;
-  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   SetUniform4f(color, "u_Colors");
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  SetUniformMat4f(mvp, "u_MVP");
+  SetUniformMat4f(modeltr, "u_Model");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -538,9 +584,10 @@ void CGRASphere::drawIt(glm::mat4 V, glm::mat4 P) {
   m_IB.Bind();
 
   glm::mat4 mvp = P * V * modeltr;
-  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  
+  SetUniformMat4f(mvp, "u_MVP");
   SetUniform4f(color, "u_Colors");
+  SetUniformMat4f(modeltr, "u_Model");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -617,9 +664,10 @@ void CGRACylinder::drawIt(glm::mat4 V, glm::mat4 P) {
   m_IB.Bind();
 
   glm::mat4 mvp = P * V * modeltr;
-  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
+
   SetUniform4f(color, "u_Colors");
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+  SetUniformMat4f(mvp, "u_MVP");
+  SetUniformMat4f(modeltr, "u_Model");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -662,7 +710,7 @@ CGRACone::CGRACone() {
 
     theta += 2 * PI / 10;
 
-    std::cout << "Base: (u, v) -> (" << static_cast<float>(i / 9.0f) << ", " << 0.0f << ").\n";
+//    std::cout << "Base: (u, v) -> (" << static_cast<float>(i / 9.0f) << ", " << 0.0f << ").\n";
   }
   m_VB.Push(GL_ARRAY_BUFFER, vtx_info.size() * sizeof(float), vtx_info.data(),
             GL_STATIC_DRAW);
@@ -691,9 +739,10 @@ void CGRACone::drawIt(glm::mat4 V, glm::mat4 P) {
   m_IB.Bind();
 
   glm::mat4 mvp = P * V * modeltr;
-  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
+
+  SetUniformMat4f(mvp, "u_MVP");
   SetUniform4f(color, "u_Colors");
+  SetUniformMat4f(modeltr, "u_Model");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);

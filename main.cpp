@@ -59,11 +59,9 @@
 
 #define GLEW_STATIC
 
-Camera camera(glm::vec3(0.0f, 3.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f,
+Camera camera(glm::vec3(0.0f, 1.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f,
               0.0f);
-
-/*Camera cameraCarro(glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-   0.0f, 0.0f);*/
+float AmbientColor[3] = {1.0f, 1.0f, 1.0f}; // Por norma, luz branca (mudar eventualmente para cenario nighttime).
 
 DEECShader *basicShader;
 GLFWwindow *window;
@@ -84,6 +82,17 @@ glm::vec4 GetTranslationFromMat4(const glm::mat4 &modeltr) {
   }
   return outVector;
 }
+
+void PrintVec4(glm::vec4 Matrix) {
+  std::cout << Matrix[0] << "\t" << Matrix[1] << "\t" << Matrix[2] << "\t" << Matrix[3] << "\n";
+}
+
+void SetUniform3f(float f0, float f1, float f2, std::string uniformName, DEECShader * shader) {
+  int data_location =
+      glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
+  glUniform3f(data_location, f0, f1, f2);
+}
+
 
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
                  int mods) {
@@ -165,7 +174,7 @@ int main(int argc, char const *argv[]) {
 
   basicShader = new DEECShader;
   std::cout << "loading shaders.\n";
-  if (basicShader->loadShaders("texture.vert", "texture.frag") == GL_FALSE) {
+  if (basicShader->loadShaders("texturelight.vert", "texturelight.frag") == GL_FALSE) {
     printf("ERROR LOADING SHADERS.\n");
     exit(EXIT_FAILURE);
   }
@@ -175,6 +184,8 @@ int main(int argc, char const *argv[]) {
     exit(EXIT_FAILURE);
   }
   basicShader->startUsing();
+  //SetUniform3f(0.0f, 0.0f, 0.0f, "u_AmbientLightColor", basicShader);
+  SetUniform3f(AmbientColor[0], AmbientColor[1], AmbientColor[2], "u_AmbientLightColor", basicShader);
 
   std::cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
   std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
@@ -250,6 +261,7 @@ int main(int argc, char const *argv[]) {
   //track.setChessTexture(true);
   //chao.setChessTexture(true);
   cartaz.setTexture("tattoo.ppm");
+  trophy.setTexture("tattoo.ppm");
   track.setShader(basicShader);
   cartaz.setShader(basicShader);
   trophy.setShader(basicShader);
@@ -376,39 +388,41 @@ int main(int argc, char const *argv[]) {
   arvoreTroncoObj.PropagateModelTransformation(arvoreTroncoPosition);
 
   // Definição de cores.
-/*  glm::vec4 grassColor = glm::vec4(0.3f, 0.5f, 0.27f, 1.0f);
+  glm::vec4 grassColor = glm::vec4(0.3f, 0.5f, 0.27f, 1.0f);
   glm::vec4 treeColor = glm::vec4(0.2f, 0.8f, 0.27f, 1.0f);
   glm::vec4 trunkColor = glm::vec4(0.39f, 0.26f, 0.13f, 1.0f);
   glm::vec4 blackColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  glm::vec4 trackColor = glm::vec4(0.8f);
+//  glm::vec4 trackColor = glm::vec4(0.8f);
   glm::vec4 trophyColor = glm::vec4(0.97f, 0.65f, 0.01f, 1.0f);
-  glm::vec4 pneuColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
+//  glm::vec4 pneuColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
   glm::vec4 solColor = glm::vec4(0.98f, 0.99f, 0.06f, 1.0f);
   glm::vec4 coneColor = glm::vec4(1.0f, 0.49f, 0.0f, 1.0f);
   glm::vec4 carroColor = glm::vec4(0.9f, 0.3f, 0.2f, 1.0f);
   glm::vec4 carro2Color = glm::vec4(0.5f, 0.1f, 0.9f, 1.0f);
+  glm::vec4 whiteColor = glm::vec4(1.0f);
 
 
   // Transmitir cores como variáveis uniformes
   trophy.SetColor(trophyColor);
-  track.SetColor(trackColor);
+/*  track.SetColor(trackColor);
   pneu.SetColor(pneuColor);
   carroPneu.SetColor(pneuColor);
   carroPneu2.SetColor(pneuColor);
   carroPneu3.SetColor(pneuColor);
-  carroPneu4.SetColor(pneuColor);
+  carroPneu4.SetColor(pneuColor);*/
   carroCorpo.SetColor(carroColor);
   carro2Corpo.SetColor(carro2Color);
   sol.SetColor(solColor);
-  cone.SetColor(coneColor);
+//  cone.SetColor(coneColor);
   cone2.SetColor(coneColor);
   chao.SetColor(carroColor);
-  cartaz.SetColor(blackColor);
+  cartaz.SetColor(whiteColor);
   arvoreFolhas.SetColor(treeColor);
-  arvoreTronco.SetColor(trunkColor);*/
+  arvoreTronco.SetColor(trunkColor);
 
   // Preparar câmara para rastrear posição de um condutor.
   glm::vec3 cameraCarroPosition(1.0f);
+  glm::vec4 cameraPosition(1.0f);
 
   float carroTheta = 0.0f;
 
@@ -453,6 +467,9 @@ int main(int argc, char const *argv[]) {
     else
       // Definir matriz de vista como a do condutor.
       activeView = driverView;
+
+//void SetUniform3f(float f0, float f1, float f2, std::string uniformName, DEECShader * shader)
+    SetUniform3f(camera.m_Position[0], camera.m_Position[1], camera.m_Position[2], "u_CameraPosition", basicShader);
 
     // Desenhar chao
     chao.drawIt(activeView, proj);

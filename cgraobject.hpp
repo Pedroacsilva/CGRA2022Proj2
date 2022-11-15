@@ -58,6 +58,7 @@ public:
   void setShader(DEECShader *shaderprog);
   void SetColor(glm::vec4 color);
   void SetUniform4f(glm::vec4 data, std::string uniformName);
+  void SetUniformMat4f(glm::mat4 data, std::string uniformName);
   void Bind() const;
   void Unbind() const;
   void AddVA(const VertexArray va);
