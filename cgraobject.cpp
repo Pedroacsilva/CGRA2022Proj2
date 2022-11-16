@@ -145,6 +145,10 @@ void CGRAobject::setTexture(const char *fname, bool filterlinear) {
 
 void CGRAobject::drawIt(glm::mat4 V, glm::mat4 P) {}
 
+void CGRAobject::SetSpecularReaction(float data){
+  specularReaction = data;  
+}
+
 
 
 /*--------------------------+
@@ -288,17 +292,18 @@ CGRAExtrusion::~CGRAExtrusion() {}
 void CGRAExtrusion::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
+
   glm::mat4 mvp = P * V * modeltr;
+  
   SetUniformMat4f(mvp, "u_MVP");
+  SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
   SetUniform1f(shininess, "u_Shininess");
+  SetUniform1f(specularReaction, "u_SpecularReaction");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
-//  int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
-  //  std::cout << "mvp_location: " << mvp_location << "\n";
-//  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
-  SetUniform4f(color, "u_Colors");
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*--------------------------+
@@ -403,11 +408,14 @@ CGRARevolution::~CGRARevolution() {}
 void CGRARevolution::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
+
   glm::mat4 mvp = P * V * modeltr;
+  
   SetUniformMat4f(mvp, "u_MVP");
-  SetUniformMat4f(modeltr, "u_Model");
   SetUniform4f(color, "u_Colors");
+  SetUniformMat4f(modeltr, "u_Model");
   SetUniform1f(shininess, "u_Shininess");
+  SetUniform1f(specularReaction, "u_SpecularReaction");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -448,11 +456,14 @@ CGRASquare::~CGRASquare() {}
 void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
+
   glm::mat4 mvp = P * V * modeltr;
-  SetUniform4f(color, "u_Colors");
+  
   SetUniformMat4f(mvp, "u_MVP");
+  SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
   SetUniform1f(shininess, "u_Shininess");
+  SetUniform1f(specularReaction, "u_SpecularReaction");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -516,11 +527,14 @@ CGRACube::~CGRACube() {}
 void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
+
   glm::mat4 mvp = P * V * modeltr;
-  SetUniform4f(color, "u_Colors");
+  
   SetUniformMat4f(mvp, "u_MVP");
+  SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
   SetUniform1f(shininess, "u_Shininess");
+  SetUniform1f(specularReaction, "u_SpecularReaction");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -612,6 +626,7 @@ void CGRASphere::drawIt(glm::mat4 V, glm::mat4 P) {
   SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
   SetUniform1f(shininess, "u_Shininess");
+  SetUniform1f(specularReaction, "u_SpecularReaction");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -688,11 +703,12 @@ void CGRACylinder::drawIt(glm::mat4 V, glm::mat4 P) {
   m_IB.Bind();
 
   glm::mat4 mvp = P * V * modeltr;
-
-  SetUniform4f(color, "u_Colors");
+  
   SetUniformMat4f(mvp, "u_MVP");
+  SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
   SetUniform1f(shininess, "u_Shininess");
+  SetUniform1f(specularReaction, "u_SpecularReaction");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -764,14 +780,14 @@ void CGRACone::drawIt(glm::mat4 V, glm::mat4 P) {
   m_IB.Bind();
 
   glm::mat4 mvp = P * V * modeltr;
-
+  
   SetUniformMat4f(mvp, "u_MVP");
   SetUniform4f(color, "u_Colors");
   SetUniformMat4f(modeltr, "u_Model");
   SetUniform1f(shininess, "u_Shininess");
+  SetUniform1f(specularReaction, "u_SpecularReaction");
   if(hasTexture)
     glBindTexture(GL_TEXTURE_2D, textureID);
-
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
-//  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }

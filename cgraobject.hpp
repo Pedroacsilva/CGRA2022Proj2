@@ -52,7 +52,7 @@ public:
   GLuint textureID;
   bool hasTexture;
   float shininess = 1.0f;
-  void SetShininess(float data);
+  float specularReaction = 0.0f;
 
   CGRAobject();
   virtual ~CGRAobject() = 0;
@@ -62,6 +62,8 @@ public:
   void SetUniform4f(glm::vec4 data, std::string uniformName);
   void SetUniformMat4f(glm::mat4 data, std::string uniformName);
   void SetUniform1f(float data, std::string uniformName);
+  void SetShininess(float data);
+  void SetSpecularReaction(float data);
   void Bind() const;
   void Unbind() const;
   void AddVA(const VertexArray va);

@@ -148,13 +148,27 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
     visitorPOV = !visitorPOV;
   if (glfwGetKey(window, GLFW_KEY_N) == GLFW_TRUE){
     glClearColor(0.3f, 0.25f, 0.56f, 1.0f);
-    SetUniform1f(0.1, "AmbientStrength", basicShader);
-    SetUniform1f(0.0, "DirectionalDiffStrength", basicShader);
+    SetUniform1f(0.1f, "u_AmbientStrength", basicShader);
+    SetUniform1f(0.0f, "u_DirectionalDiffStrength", basicShader);
+    SetUniform1f(0.0f, "u_SpecularStrength", basicShader);
+    SetUniform1f(0.1f, "u_WhiteLampAmbientStrength", basicShader);
+    SetUniform1f(0.5f, "u_WhiteLampDiffuseStrength", basicShader);
+    SetUniform1f(0.0f, "u_WhiteLampSpecularStrength", basicShader);
+    SetUniform1f(0.8f, "u_ColoredAmbientStrength", basicShader);
+    SetUniform1f(0.8f, "u_ColoredDirectionalDiffStrength", basicShader);
+    SetUniform1f(0.1f, "u_ColoredSpecularStrength", basicShader);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_TRUE){
     glClearColor(0.53f, 0.8f, 0.92f, 1.0f);
-    SetUniform1f(0.8, "AmbientStrength", basicShader);
-    SetUniform1f(0.1, "DirectionalDiffStrength", basicShader);
+    SetUniform1f(0.8f, "u_AmbientStrength", basicShader);
+    SetUniform1f(0.8f, "u_DirectionalDiffStrength", basicShader);
+    SetUniform1f(0.8f, "u_SpecularStrength", basicShader);
+    SetUniform1f(0.0f, "u_WhiteLampAmbientStrength", basicShader);
+    SetUniform1f(0.0f, "u_WhiteLampDiffuseStrength", basicShader);
+    SetUniform1f(0.0f, "u_WhiteLampSpecularStrength", basicShader);
+    SetUniform1f(0.1f, "u_ColoredAmbientStrength", basicShader);
+    SetUniform1f(0.0f, "u_ColoredDirectionalDiffStrength", basicShader);
+    SetUniform1f(0.0f, "u_ColoredSpecularStrength", basicShader);
   }
 }
 
@@ -202,10 +216,13 @@ int main(int argc, char const *argv[]) {
     exit(EXIT_FAILURE);
   }
   basicShader->startUsing();
+  // Setup de uniformes para iluminação. Começar no cenário de dia.
   // SetUniform3f(0.0f, 0.0f, 0.0f, "u_AmbientLightColor", basicShader);
   SetUniform3f(AmbientColor[0], AmbientColor[1], AmbientColor[2],
                "u_AmbientLightColor", basicShader);
-  SetUniform1f(0.8f, "AmbientStrength", basicShader);
+  SetUniform1f(0.8f, "u_AmbientStrength", basicShader);
+  SetUniform1f(0.8f, "u_DirectionalDiffStrength", basicShader);
+  SetUniform1f(0.8f, "u_SpecularStrength", basicShader);
   std::cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
   std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
   std::cout << "Version: " << glGetString(GL_VERSION) << "\n";
@@ -229,6 +246,7 @@ int main(int argc, char const *argv[]) {
   CGRACube carroCorpo, carro2Corpo;
   CGRASquare cartaz;
   CGRASphere sol;
+  static CGRASphere lampadaBranca, lampadaColorida;
   CGRACylinder pneu;
   CGRACylinder carroPneu, carroPneu2, carroPneu3, carroPneu4, arvoreTronco;
   CGRACone cone, arvoreFolhas;
@@ -281,7 +299,11 @@ int main(int argc, char const *argv[]) {
   // track.setChessTexture(true);
   // chao.setChessTexture(true);
   cartaz.setTexture("tattoo.ppm");
-  trophy.setTexture("tattoo.ppm");
+  trophy.setTexture("trophytexture.ppm");
+  lampadaBranca.setTexture("lamptexture.ppm");
+  lampadaColorida.setTexture("lamptexture.ppm");
+
+
   track.setShader(basicShader);
   cartaz.setShader(basicShader);
   trophy.setShader(basicShader);
@@ -298,6 +320,8 @@ int main(int argc, char const *argv[]) {
   carroPneu4.setShader(basicShader);
   arvoreFolhas.setShader(basicShader);
   arvoreTronco.setShader(basicShader);
+  lampadaColorida.setShader(basicShader);
+  lampadaBranca.setShader(basicShader);
 
   glm::mat4 chaoPosition(1.0f);
   glm::mat4 cartazPosition(1.0f);
@@ -312,6 +336,8 @@ int main(int argc, char const *argv[]) {
   glm::mat4 carroPneuPosition(1.0f);
   glm::mat4 arvoreFolhasPosition(1.0f);
   glm::mat4 arvoreTroncoPosition(1.0f);
+  glm::mat4 lampadaBrancaPosition(1.0f);
+  glm::mat4 lampadaColoridaPosition(1.0f);
 
   // Deslocar objectos na cena.
 
@@ -395,6 +421,13 @@ int main(int argc, char const *argv[]) {
   arvoreTroncoPosition =
       glm::scale(arvoreTroncoPosition, glm::vec3(0.3f, 1.0f, 1.0f));
 
+
+  lampadaBrancaPosition = glm::scale(lampadaBrancaPosition, glm::vec3(0.5f));
+  lampadaBrancaPosition = glm::translate(lampadaBrancaPosition, glm::vec3(3.0f, 8.5f, 0.0f));
+
+  lampadaColoridaPosition = glm::scale(lampadaColoridaPosition, glm::vec3(0.5f));
+  lampadaColoridaPosition = glm::translate(lampadaColoridaPosition, glm::vec3(-3.0f, 8.5f, 0.0f));
+
   // Definir transformadas iniciais.
   chao.setModelTransformation(chaoPosition);
   cartaz.setModelTransformation(cartazPosition);
@@ -404,6 +437,8 @@ int main(int argc, char const *argv[]) {
   cone2.setModelTransformation(cone2Position);
   track.setModelTransformation(trackPosition);
   trophy.setModelTransformation(trophyPosition);
+  lampadaBranca.setModelTransformation(lampadaBrancaPosition);
+  lampadaColorida.setModelTransformation(lampadaColoridaPosition);
   carroCorpoObj.PropagateModelTransformation(carroCorpoPosition);
   carro2CorpoObj.PropagateModelTransformation(carro2CorpoPosition);
   arvoreTroncoObj.PropagateModelTransformation(arvoreTroncoPosition);
@@ -420,7 +455,7 @@ int main(int argc, char const *argv[]) {
   glm::vec4 coneColor = glm::vec4(1.0f, 0.49f, 0.0f, 1.0f);
   glm::vec4 carroColor = glm::vec4(0.9f, 0.3f, 0.2f, 1.0f);
   glm::vec4 carro2Color = glm::vec4(0.5f, 0.1f, 0.9f, 1.0f);
-  glm::vec4 whiteColor = glm::vec4(1.0f);
+  glm::vec4 whiteColor = glm::vec4(0.9f);
 
   // Transmitir cores como variáveis uniformes
   trophy.SetColor(trophyColor);
@@ -439,8 +474,14 @@ int main(int argc, char const *argv[]) {
   cartaz.SetColor(whiteColor);
   arvoreFolhas.SetColor(treeColor);
   arvoreTronco.SetColor(trunkColor);
+  lampadaBranca.SetColor(whiteColor);
+  lampadaColorida.SetColor(blackColor);
 
-  carroCorpo.SetShininess(2.0f);
+  carroCorpo.SetSpecularReaction(2.0f);
+  carro2Corpo.SetSpecularReaction(2.0f);
+
+  carroCorpo.SetShininess(64.0f);
+  carro2Corpo.SetShininess(64.0f);
 
   // Preparar câmara para rastrear posição de um condutor.
   glm::vec3 cameraCarroPosition(1.0f);
@@ -532,12 +573,17 @@ int main(int argc, char const *argv[]) {
     // Desenhar árvore
     arvoreTroncoObj.DrawTree(activeView, proj);
 
-    // Desenhar carro
+    // Desenhar carros (Ligar componente especular)
     carroCorpoObj.PropagateModelTransformation(carrosPos);
     carro2CorpoObj.PropagateModelTransformation(carrosPos);
 
     carroCorpoObj.DrawTree(activeView, proj);
     carro2CorpoObj.DrawTree(activeView, proj);
+
+    // Desenhar lampadas
+    lampadaBranca.drawIt(activeView, proj);
+    lampadaColorida.drawIt(activeView, proj);
+
 
     glfwSwapBuffers(window);
     glfwPollEvents();
