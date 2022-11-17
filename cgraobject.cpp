@@ -201,7 +201,7 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
   unsigned int numPontos = pontos.size();
   //  std::cout << "num de pontos: " << numPontos << "\n";
   float x_new = 0.0f, y_new = 0.0f, z_new = 0.0f, x, y, z;
-  float u = - 1.0f / (numPontos - 1), v = -1.0f / (numPontos - 1);
+  float u = - 1.0f / (numPontos - 1);//, v = -1.0f / (numPontos - 1);
   // Push dos pontos iniciais
   for (const auto &elemt : pontos) {
     u += 1.0f / (numPontos - 1);
@@ -213,7 +213,7 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     // UV
     vtx_info.emplace_back(u);
     vtx_info.emplace_back(0.0f);
-    std::cout << u << "\t" << v << "\n";
+//    std::cout << u << "\t" << v << "\n";
     // RGBA 
     vtx_info.emplace_back(0.5f);
     vtx_info.emplace_back(0.5f);
@@ -243,7 +243,7 @@ CGRAExtrusion::CGRAExtrusion(std::vector<glm::vec3> pontos) {
     // UV
     vtx_info.emplace_back(u);
     vtx_info.emplace_back(1.0);
-    std::cout << u << "\t" << v << "\n";
+//    std::cout << u << "\t" << v << "\n";
     // RGBA 
     vtx_info.emplace_back(0.5f);
     vtx_info.emplace_back(0.5f);

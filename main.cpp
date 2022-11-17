@@ -102,6 +102,9 @@ void SetUniform1f(float f0, std::string uniformName, DEECShader *shader) {
   glUniform1f(data_location, f0);
 }
 
+
+glm::vec4 lampadaColoridaColor(0.0f);
+
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
                  int mods) {
 
@@ -146,19 +149,19 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
   }
   if (glfwGetKey(window, GLFW_KEY_V) == GLFW_TRUE)
     visitorPOV = !visitorPOV;
-  if (glfwGetKey(window, GLFW_KEY_N) == GLFW_TRUE){
+  if (glfwGetKey(window, GLFW_KEY_N) == GLFW_TRUE) {
     glClearColor(0.3f, 0.25f, 0.56f, 1.0f);
-    SetUniform1f(0.1f, "u_AmbientStrength", basicShader);
+    SetUniform1f(0.0f, "u_AmbientStrength", basicShader);
     SetUniform1f(0.0f, "u_DirectionalDiffStrength", basicShader);
     SetUniform1f(0.0f, "u_SpecularStrength", basicShader);
-    SetUniform1f(0.1f, "u_WhiteLampAmbientStrength", basicShader);
-    SetUniform1f(0.5f, "u_WhiteLampDiffuseStrength", basicShader);
-    SetUniform1f(0.0f, "u_WhiteLampSpecularStrength", basicShader);
-    SetUniform1f(0.8f, "u_ColoredAmbientStrength", basicShader);
-    SetUniform1f(0.8f, "u_ColoredDirectionalDiffStrength", basicShader);
-    SetUniform1f(0.1f, "u_ColoredSpecularStrength", basicShader);
+    SetUniform1f(0.05f, "u_WhiteLampAmbientStrength", basicShader);
+    SetUniform1f(0.1f, "u_WhiteLampDiffuseStrength", basicShader);
+    SetUniform1f(0.1f, "u_WhiteLampSpecularStrength", basicShader);
+    SetUniform1f(0.05f, "u_ColoredLampAmbientStrength", basicShader);
+    SetUniform1f(0.1f, "u_ColoredLampDiffuseStrength", basicShader);
+    SetUniform1f(0.1f, "u_ColoredLampSpecularStrength", basicShader);
   }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_TRUE){
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_TRUE) {
     glClearColor(0.53f, 0.8f, 0.92f, 1.0f);
     SetUniform1f(0.8f, "u_AmbientStrength", basicShader);
     SetUniform1f(0.8f, "u_DirectionalDiffStrength", basicShader);
@@ -166,9 +169,29 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
     SetUniform1f(0.0f, "u_WhiteLampAmbientStrength", basicShader);
     SetUniform1f(0.0f, "u_WhiteLampDiffuseStrength", basicShader);
     SetUniform1f(0.0f, "u_WhiteLampSpecularStrength", basicShader);
-    SetUniform1f(0.1f, "u_ColoredAmbientStrength", basicShader);
-    SetUniform1f(0.0f, "u_ColoredDirectionalDiffStrength", basicShader);
-    SetUniform1f(0.0f, "u_ColoredSpecularStrength", basicShader);
+    SetUniform1f(0.0f, "u_ColoredLampAmbientStrength", basicShader);
+    SetUniform1f(0.0f, "u_ColoredLampDiffuseStrength", basicShader);
+    SetUniform1f(0.0f, "u_ColoredLampSpecularStrength", basicShader);
+  }
+  if (glfwGetKey(window, GLFW_KEY_1) == GLFW_TRUE) {
+    SetUniform3f(1.0f, 0.0f, 0.0f, "u_ColoredLampColor", basicShader);
+    lampadaColoridaColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_2) == GLFW_TRUE) {
+    SetUniform3f(0.0f, 1.0f, 0.0f, "u_ColoredLampColor", basicShader);
+    lampadaColoridaColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_3) == GLFW_TRUE) {
+    SetUniform3f(0.0f, 0.0f, 1.0f, "u_ColoredLampColor", basicShader);
+    lampadaColoridaColor = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_4) == GLFW_TRUE) {
+    SetUniform3f(1.0f, 1.0f, 1.0f, "u_ColoredLampColor", basicShader);
+    lampadaColoridaColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_5) == GLFW_TRUE) {
+    SetUniform3f(0.0f, 0.0f, 0.0f, "u_ColoredLampColor", basicShader);
+    lampadaColoridaColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   }
 }
 
@@ -245,8 +268,9 @@ int main(int argc, char const *argv[]) {
   CGRASquare chao;
   CGRACube carroCorpo, carro2Corpo;
   CGRASquare cartaz;
-  CGRASphere sol;
-  static CGRASphere lampadaBranca, lampadaColorida;
+  CGRASphere sol, esferaDeco;
+  CGRASphere bolaNatal;
+  CGRASphere lampadaBranca, lampadaColorida;
   CGRACylinder pneu;
   CGRACylinder carroPneu, carroPneu2, carroPneu3, carroPneu4, arvoreTronco;
   CGRACone cone, arvoreFolhas;
@@ -292,6 +316,7 @@ int main(int argc, char const *argv[]) {
   carroPneu2.setTexture("pneutexture.ppm");
   carroPneu3.setTexture("pneutexture.ppm");
   carroPneu4.setTexture("pneutexture.ppm");
+  esferaDeco.setTexture("tattoo.ppm");
   cone.setTexture("conetexture.ppm");
   chao.setTexture("grass.ppm");
   track.setTexture("tracktexture.ppm");
@@ -302,7 +327,7 @@ int main(int argc, char const *argv[]) {
   trophy.setTexture("trophytexture.ppm");
   lampadaBranca.setTexture("lamptexture.ppm");
   lampadaColorida.setTexture("lamptexture.ppm");
-
+  bolaNatal.setTexture("trophytexture.ppm");
 
   track.setShader(basicShader);
   cartaz.setShader(basicShader);
@@ -312,6 +337,7 @@ int main(int argc, char const *argv[]) {
   pneu.setShader(basicShader);
   sol.setShader(basicShader);
   chao.setShader(basicShader);
+  esferaDeco.setShader(basicShader);
   carroCorpo.setShader(basicShader);
   carro2Corpo.setShader(basicShader);
   carroPneu.setShader(basicShader);
@@ -322,11 +348,13 @@ int main(int argc, char const *argv[]) {
   arvoreTronco.setShader(basicShader);
   lampadaColorida.setShader(basicShader);
   lampadaBranca.setShader(basicShader);
+  bolaNatal.setShader(basicShader);
 
   glm::mat4 chaoPosition(1.0f);
   glm::mat4 cartazPosition(1.0f);
   glm::mat4 trackPosition(1.0f);
   glm::mat4 solPosition(1.0f);
+  glm::mat4 esferaPosition(1.0f);
   glm::mat4 pneuPosition(1.0f);
   glm::mat4 conePosition(1.0f);
   glm::mat4 cone2Position(1.0f);
@@ -338,6 +366,7 @@ int main(int argc, char const *argv[]) {
   glm::mat4 arvoreTroncoPosition(1.0f);
   glm::mat4 lampadaBrancaPosition(1.0f);
   glm::mat4 lampadaColoridaPosition(1.0f);
+  glm::mat4 bolaNatalPosition(1.0f);
 
   // Deslocar objectos na cena.
 
@@ -365,6 +394,11 @@ int main(int argc, char const *argv[]) {
       glm::vec3(5.9f, 1.0f, -3.0f), glm::vec3(5.9f, 1.0f, -1.5f),
       glm::vec3(5.9f, 1.0f, 0.0f), glm::vec3(5.9f, 1.0f, 1.5f),
       glm::vec3(5.9f, 1.0f, 3.0f)};
+
+  std::vector<glm::vec3> bolaNatalLocations = {
+      glm::vec3(-70.0f, 16.0f, -47.0f), glm::vec3(-75.0f, 16.0f, -51.0f),
+      glm::vec3(-65.0f, 13.0f, -51.0f)
+  };
 
   pneuPosition = glm::scale(pneuPosition, glm::vec3(0.6f, 0.1f, 0.2f));
   pneuPosition = glm::translate(pneuPosition, glm::vec3(-1.0f, 1.5f, 0.0f));
@@ -421,17 +455,25 @@ int main(int argc, char const *argv[]) {
   arvoreTroncoPosition =
       glm::scale(arvoreTroncoPosition, glm::vec3(0.3f, 1.0f, 1.0f));
 
-
   lampadaBrancaPosition = glm::scale(lampadaBrancaPosition, glm::vec3(0.5f));
-  lampadaBrancaPosition = glm::translate(lampadaBrancaPosition, glm::vec3(3.0f, 8.5f, 0.0f));
+  lampadaBrancaPosition =
+      glm::translate(lampadaBrancaPosition, glm::vec3(3.0f, 8.5f, 0.0f));
 
-  lampadaColoridaPosition = glm::scale(lampadaColoridaPosition, glm::vec3(0.5f));
-  lampadaColoridaPosition = glm::translate(lampadaColoridaPosition, glm::vec3(-3.0f, 8.5f, 0.0f));
+  lampadaColoridaPosition =
+      glm::scale(lampadaColoridaPosition, glm::vec3(0.5f));
+  lampadaColoridaPosition =
+      glm::translate(lampadaColoridaPosition, glm::vec3(-3.0f, 8.5f, 0.0f));
+
+  esferaPosition = glm::translate(esferaPosition, glm::vec3(0.0f, 1.0f, -1.0f));
+
+  bolaNatalPosition = glm::scale(bolaNatalPosition, glm::vec3(0.1f));
+  bolaNatalPosition = glm::translate(bolaNatalPosition, glm::vec3(-65.0f, 13.0f, -51.0f));
 
   // Definir transformadas iniciais.
   chao.setModelTransformation(chaoPosition);
   cartaz.setModelTransformation(cartazPosition);
   sol.setModelTransformation(solPosition);
+  esferaDeco.setModelTransformation(esferaPosition);
   pneu.setModelTransformation(pneuPosition);
   cone.setModelTransformation(conePosition);
   cone2.setModelTransformation(cone2Position);
@@ -439,6 +481,7 @@ int main(int argc, char const *argv[]) {
   trophy.setModelTransformation(trophyPosition);
   lampadaBranca.setModelTransformation(lampadaBrancaPosition);
   lampadaColorida.setModelTransformation(lampadaColoridaPosition);
+  bolaNatal.setModelTransformation(bolaNatalPosition);
   carroCorpoObj.PropagateModelTransformation(carroCorpoPosition);
   carro2CorpoObj.PropagateModelTransformation(carro2CorpoPosition);
   arvoreTroncoObj.PropagateModelTransformation(arvoreTroncoPosition);
@@ -457,18 +500,12 @@ int main(int argc, char const *argv[]) {
   glm::vec4 carro2Color = glm::vec4(0.5f, 0.1f, 0.9f, 1.0f);
   glm::vec4 whiteColor = glm::vec4(0.9f);
 
-  // Transmitir cores como variáveis uniformes
+  // Definir cores dos objectos
   trophy.SetColor(trophyColor);
-  /*  track.SetColor(trackColor);
-    pneu.SetColor(pneuColor);
-    carroPneu.SetColor(pneuColor);
-    carroPneu2.SetColor(pneuColor);
-    carroPneu3.SetColor(pneuColor);
-    carroPneu4.SetColor(pneuColor);*/
+  chao.SetColor(grassColor);
   carroCorpo.SetColor(carroColor);
   carro2Corpo.SetColor(carro2Color);
   sol.SetColor(solColor);
-  //  cone.SetColor(coneColor);
   cone2.SetColor(coneColor);
   chao.SetColor(carroColor);
   cartaz.SetColor(whiteColor);
@@ -476,12 +513,16 @@ int main(int argc, char const *argv[]) {
   arvoreTronco.SetColor(trunkColor);
   lampadaBranca.SetColor(whiteColor);
   lampadaColorida.SetColor(blackColor);
+  esferaDeco.SetColor(whiteColor);
+  bolaNatal.SetColor(whiteColor);
 
   carroCorpo.SetSpecularReaction(2.0f);
   carro2Corpo.SetSpecularReaction(2.0f);
+  bolaNatal.SetSpecularReaction(2.0f);
 
   carroCorpo.SetShininess(64.0f);
   carro2Corpo.SetShininess(64.0f);
+  bolaNatal.SetShininess(128.0f);
 
   // Preparar câmara para rastrear posição de um condutor.
   glm::vec3 cameraCarroPosition(1.0f);
@@ -567,11 +608,24 @@ int main(int argc, char const *argv[]) {
     // Desenhar sol
     sol.drawIt(activeView, proj);
 
+    // Desenhar esfera decorativa
+    esferaDeco.drawIt(activeView, proj);
+
     // Desenhar cone (revolucao)
     cone2.drawIt(activeView, proj);
 
     // Desenhar árvore
     arvoreTroncoObj.DrawTree(activeView, proj);
+
+    // Desenhar bolas de natal (se tiver tempo, refazer objectos hierarquicos para isto estar melhor)
+    for(const auto &elemt : bolaNatalLocations){
+      glm::mat4 location(1.0f);
+      location = glm::scale(location, glm::vec3(0.1f));
+      location = glm::translate(location, elemt);
+      bolaNatal.setModelTransformation(location);
+      bolaNatal.drawIt(activeView, proj);
+    }
+    //bolaNatal.drawIt(activeView, proj);
 
     // Desenhar carros (Ligar componente especular)
     carroCorpoObj.PropagateModelTransformation(carrosPos);
@@ -582,8 +636,13 @@ int main(int argc, char const *argv[]) {
 
     // Desenhar lampadas
     lampadaBranca.drawIt(activeView, proj);
-    lampadaColorida.drawIt(activeView, proj);
 
+    // Cor da lampada colorida pode mudar e não dá muito jeito este objecto ser
+    // global (tem de ser construído depois do contexto OpenGL), portanto tenho
+    // de fazer assim.
+
+    lampadaColorida.SetColor(lampadaColoridaColor);
+    lampadaColorida.drawIt(activeView, proj);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
