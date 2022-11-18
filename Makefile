@@ -9,6 +9,9 @@ cgraimage.o:	cgraimage.h cgraimage.cpp
 textures: deecshader.o textures.cpp cgraimage.o cgraobject.cpp
 	g++ -o textures	deecshader.o cgraimage.o textures.cpp	-I/opt/local/include -I./vendor/stb_image -I./vendor -I./vendor/imgui  -lglfw -lGLEW -lGL -Wall -lrt -lm -ldl -lnetpbm 
 
+fbo_test: deecshader.o cgraobject.cpp fbo_test.cpp FrameBuffer.cpp RenderBuffer.cpp TextureBuffer.cpp
+	g++ -o fbo_test	deecshader.o cgraimage.o fbo_test.cpp	-I/opt/local/include -I./vendor/stb_image -I./vendor -I./vendor/imgui  -lglfw -lGLEW -lGL -Wall -lrt -lm -ldl -lnetpbm 
+
 deecshader.o:
 	g++ -c -g deecshader.cpp 
 

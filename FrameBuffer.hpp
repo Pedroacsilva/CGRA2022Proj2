@@ -1,9 +1,13 @@
 #pragma once
 
 class FrameBuffer {
-public:
+  unsigned int m_Renderer_ID;
 
-	FrameBuffer();
-	~FrameBuffer();
-	
+public:
+  FrameBuffer();
+  ~FrameBuffer();
+  void Bind();
+  void Unbind();
+  unsigned int GetID();
+  void Validate();
 };

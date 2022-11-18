@@ -54,6 +54,21 @@
 #define IB
 #endif
 
+#ifndef TBO
+#include "TextureBuffer.cpp"
+#define TBO
+#endif
+
+#ifndef RBO
+#include "RenderBuffer.cpp"
+#define RBO
+#endif
+
+#ifndef FBO
+#include "FrameBuffer.cpp"
+#define FBO
+#endif
+
 #include "cgraobject.cpp"
 #include "deecshader.h"
 
@@ -101,7 +116,6 @@ void SetUniform1f(float f0, std::string uniformName, DEECShader *shader) {
       glGetUniformLocation(shader->shaderprogram, uniformName.c_str());
   glUniform1f(data_location, f0);
 }
-
 
 glm::vec4 lampadaColoridaColor(0.0f);
 
@@ -397,8 +411,7 @@ int main(int argc, char const *argv[]) {
 
   std::vector<glm::vec3> bolaNatalLocations = {
       glm::vec3(-70.0f, 16.0f, -47.0f), glm::vec3(-75.0f, 16.0f, -51.0f),
-      glm::vec3(-65.0f, 13.0f, -51.0f)
-  };
+      glm::vec3(-65.0f, 13.0f, -51.0f)};
 
   pneuPosition = glm::scale(pneuPosition, glm::vec3(0.6f, 0.1f, 0.2f));
   pneuPosition = glm::translate(pneuPosition, glm::vec3(-1.0f, 1.5f, 0.0f));
@@ -467,7 +480,8 @@ int main(int argc, char const *argv[]) {
   esferaPosition = glm::translate(esferaPosition, glm::vec3(0.0f, 1.0f, -1.0f));
 
   bolaNatalPosition = glm::scale(bolaNatalPosition, glm::vec3(0.1f));
-  bolaNatalPosition = glm::translate(bolaNatalPosition, glm::vec3(-65.0f, 13.0f, -51.0f));
+  bolaNatalPosition =
+      glm::translate(bolaNatalPosition, glm::vec3(-65.0f, 13.0f, -51.0f));
 
   // Definir transformadas iniciais.
   chao.setModelTransformation(chaoPosition);
@@ -617,15 +631,16 @@ int main(int argc, char const *argv[]) {
     // Desenhar árvore
     arvoreTroncoObj.DrawTree(activeView, proj);
 
-    // Desenhar bolas de natal (se tiver tempo, refazer objectos hierarquicos para isto estar melhor)
-    for(const auto &elemt : bolaNatalLocations){
+    // Desenhar bolas de natal (se tiver tempo, refazer objectos hierarquicos
+    // para isto estar melhor)
+    for (const auto &elemt : bolaNatalLocations) {
       glm::mat4 location(1.0f);
       location = glm::scale(location, glm::vec3(0.1f));
       location = glm::translate(location, elemt);
       bolaNatal.setModelTransformation(location);
       bolaNatal.drawIt(activeView, proj);
     }
-    //bolaNatal.drawIt(activeView, proj);
+    // bolaNatal.drawIt(activeView, proj);
 
     // Desenhar carros (Ligar componente especular)
     carroCorpoObj.PropagateModelTransformation(carrosPos);
