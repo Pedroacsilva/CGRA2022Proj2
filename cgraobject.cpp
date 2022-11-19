@@ -433,6 +433,7 @@ CGRASquare::CGRASquare() {
       0.5f,  -0.5f, 0.0f, // 1
       0.5f,  0.5f,  0.0f, // 2
       -0.5f, 0.5f,  0.0f  // 3*/
+    // XYZ                UV          RGBA                    Normals
       -0.5f, 0.0f, -0.5f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 0
       0.5f,  0.0f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 1
       0.5f,  0.0f,  0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 2
@@ -476,7 +477,7 @@ void CGRASquare::drawIt(glm::mat4 V, glm::mat4 P) {
 
 CGRACube::CGRACube() {
   float face_positions[] = {
-      // Vertex Coordinates  Tex Coords       RGBA  Values       Normals
+      // Vertex Coordinates  Tex Coords       RGBA  Values              Normals
       -0.5f, -0.5f, -0.5f,    0.00f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f,// 0
       0.5f, -0.5f, -0.5f,     0.25f, 0.33f,     0.5f, 0.5f, 0.5f, 1.0f,  0.0f, 0.0f, -1.0f,// 1
       0.5f, 0.5f, -0.5f,      0.25f, 0.66f,     0.5f, 0.5f, 0.5f, 1.0f,   0.0f, 0.0f, -1.0f,// 2
@@ -572,7 +573,7 @@ xy = r *  cos(phi)            */
       y = xy * std::sin(sectorAngle);
       //XYZ
       vtx_info.emplace_back(x);       vtx_info.emplace_back(y);       vtx_info.emplace_back(z);
-      //V
+      //UV
       u = static_cast<float>(j) / 10;
       v = static_cast<float>(i) / 10;
       vtx_info.emplace_back(u);       vtx_info.emplace_back(v);

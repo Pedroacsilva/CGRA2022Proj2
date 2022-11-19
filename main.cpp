@@ -297,6 +297,14 @@ int main(int argc, char const *argv[]) {
   CGRACompound arvoreTroncoObj(arvoreTronco);
   CGRACompound arvoreFolhasObj(arvoreFolhas);
 
+  // FBO para POV do condutor
+  FrameBuffer fbo;
+  TextureBuffer tbo;
+  RenderBuffer rbo;
+  tbo.AttachToFrameBuffer(fbo);
+  rbo.AttachToFrameBuffer(fbo);
+  fbo.Validate();
+
   std::vector<glm::vec3> revoPontos;
   revoPontos.emplace_back(glm::vec3(1.2f, 0.0f, 0.0f));
   revoPontos.emplace_back(glm::vec3(0.5f, 0.0f, 0.0f));
@@ -337,7 +345,7 @@ int main(int argc, char const *argv[]) {
   cone2.setTexture("conetexture.ppm");
   // track.setChessTexture(true);
   // chao.setChessTexture(true);
-  cartaz.setTexture("tattoo.ppm");
+  //  cartaz.setTexture("tattoo.ppm");
   trophy.setTexture("trophytexture.ppm");
   lampadaBranca.setTexture("lamptexture.ppm");
   lampadaColorida.setTexture("lamptexture.ppm");
@@ -384,10 +392,10 @@ int main(int argc, char const *argv[]) {
 
   // Deslocar objectos na cena.
 
-  cartazPosition =
-      glm::rotate(cartazPosition, 1.6f, glm::vec3(1.0f, 0.0f, 0.0f));
   cartazPosition = glm::scale(cartazPosition, glm::vec3(5.0f, 2.5f, 3.0f));
-  cartazPosition = glm::translate(cartazPosition, glm::vec3(0.0f, 0.0f, -2.0f));
+  cartazPosition = glm::translate(cartazPosition, glm::vec3(0.0f, 2.0f, .0f));
+  cartazPosition =
+      glm::rotate(cartazPosition, glm::degrees(3.14f / 10.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   //  cartazPosition = glm::translate(cartazPosition, glm::vec3(1.5f, 0.0f,
   //  -2.0f));
   /*  cartazPosition = glm::rotate(cartazPosition, glm::degrees(120.0f),
@@ -579,6 +587,89 @@ int main(int argc, char const *argv[]) {
                     // driverPositionVec3 + glm::vec3(0.0f, 0.0f, -1.0f),
                     glm::vec3(0.0f, 1.0f, 0.0f));
 
+    // void SetUniform3f(float f0, float f1, float f2, std::string uniformName,
+    // DEECShader * shader)
+    SetUniform3f(camera.m_Position[0], camera.m_Position[1],
+                 camera.m_Position[2], "u_CameraPosition", basicShader);
+
+    // Desenhar no FBO para o ecra.
+
+    fbo.Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    activeView = driverView;
+
+    // Desenhar chao
+    chao.drawIt(activeView, proj);
+
+    // Desenhar cartaz
+    cartaz.drawIt(activeView, proj);
+
+    // Desenhar pista
+    track.drawIt(activeView, proj);
+
+    // Desenhar trofeu
+    trophy.drawIt(activeView, proj);
+
+    // Desenhar pneus
+    for (const auto &elemt : pneuLocations) {
+      glm::mat4 location = pneuPosition;
+      location = glm::translate(location, elemt);
+      pneu.setModelTransformation(location);
+      pneu.drawIt(activeView, proj);
+    }
+
+    // Desenhar cones
+    for (const auto &elemt : coneLocations) {
+      glm::mat4 location(1.0f);
+      location = glm::translate(location, elemt);
+      cone.setModelTransformation(location);
+      cone.drawIt(activeView, proj);
+    }
+
+    // Desenhar sol
+    sol.drawIt(activeView, proj);
+
+    // Desenhar esfera decorativa
+    esferaDeco.drawIt(activeView, proj);
+
+    // Desenhar cone (revolucao)
+    cone2.drawIt(activeView, proj);
+
+    // Desenhar árvore
+    arvoreTroncoObj.DrawTree(activeView, proj);
+
+    // Desenhar bolas de natal (se tiver tempo, refazer objectos hierarquicos
+    // para isto estar melhor)
+    for (const auto &elemt : bolaNatalLocations) {
+      glm::mat4 location(1.0f);
+      location = glm::scale(location, glm::vec3(0.1f));
+      location = glm::translate(location, elemt);
+      bolaNatal.setModelTransformation(location);
+      bolaNatal.drawIt(activeView, proj);
+    }
+    // bolaNatal.drawIt(activeView, proj);
+
+    // Desenhar carros (Ligar componente especular)
+    carroCorpoObj.PropagateModelTransformation(carrosPos);
+    carro2CorpoObj.PropagateModelTransformation(carrosPos);
+
+    carroCorpoObj.DrawTree(activeView, proj);
+    carro2CorpoObj.DrawTree(activeView, proj);
+
+    // Desenhar lampadas
+    lampadaBranca.drawIt(activeView, proj);
+
+    // Cor da lampada colorida pode mudar e não dá muito jeito este objecto ser
+    // global (tem de ser construído depois do contexto OpenGL), portanto tenho
+    // de fazer assim.
+
+    lampadaColorida.SetColor(lampadaColoridaColor);
+    lampadaColorida.drawIt(activeView, proj);
+
+    // Desenhar no framebuffer para o ecrã.
+    fbo.Unbind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     if (visitorPOV)
       // Obter matriz de vista do visitor.
       activeView = camera.GetViewMatrix();
@@ -586,16 +677,15 @@ int main(int argc, char const *argv[]) {
       // Definir matriz de vista como a do condutor.
       activeView = driverView;
 
-    // void SetUniform3f(float f0, float f1, float f2, std::string uniformName,
-    // DEECShader * shader)
-    SetUniform3f(camera.m_Position[0], camera.m_Position[1],
-                 camera.m_Position[2], "u_CameraPosition", basicShader);
-
-    // Desenhar chao
-    chao.drawIt(activeView, proj);
+    tbo.Bind();
 
     // Desenhar cartaz
     cartaz.drawIt(activeView, proj);
+
+//    tbo.Unbind();
+
+    // Desenhar chao
+    chao.drawIt(activeView, proj);
 
     // Desenhar pista
     track.drawIt(activeView, proj);

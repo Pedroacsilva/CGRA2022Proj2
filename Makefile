@@ -1,4 +1,4 @@
-all:  main textures
+all:  main textures fbo_test
 
 main: deecshader.o main.cpp cgraimage.o cgraobject.cpp
 	g++ -o main cgraimage.o deecshader.o main.cpp -I./vendor/stb_image -I./vendor -I./vendor/imgui  -lglfw -lGLEW -lGL -Wall -lrt -lm -ldl -I/opt/local/include -lnetpbm
@@ -16,4 +16,4 @@ deecshader.o:
 	g++ -c -g deecshader.cpp 
 
 clean:
-	rm -f main textures
+	rm -f main textures fbo_test

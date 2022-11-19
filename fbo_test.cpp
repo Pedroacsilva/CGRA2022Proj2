@@ -304,8 +304,8 @@ int main(int argc, char const *argv[]) {
     fbo.Unbind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    tbo.Bind();
-    cubo.hasTexture = true;
+    //tbo.Bind();
+//    cubo.hasTexture = true;
     cubo.drawIt(camera.GetViewMatrix(), proj);
 
 
